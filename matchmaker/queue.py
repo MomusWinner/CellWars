@@ -1,4 +1,1 @@
-import asyncio
-
-queue = asyncio.Queue()
-
+users = []
