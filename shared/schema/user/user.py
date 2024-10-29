@@ -1,0 +1,1 @@
+USER_QUEUE_KEY = "user.{user_id}"
