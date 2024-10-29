@@ -2,6 +2,7 @@ import aio_pika
 import msgpack
 
 from game.storage.rabbit import channel_pool
+from game.storage.redis import setup_redis
 from shared.schema.messages.match import CreateMatchMessage
 from game.handlers.match import handle_event_create_match
 
@@ -19,9 +20,10 @@ async def handle_matches():
                 async with message.process():
                     body: CreateMatchMessage = msgpack.unpackb(message.body)
                     if body['event'] == 'create_match':
-                        handle_event_create_match(body)
+                        await handle_event_create_match(body)
 
 async def main() -> None:
+    setup_redis()
     await handle_matches()
     # queue_name = "matches"
     # async with channel_pool.acquire() as channel:
