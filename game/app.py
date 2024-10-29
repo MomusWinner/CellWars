@@ -19,7 +19,7 @@ async def handle_matches():
             async for message in queue_iter:
                 async with message.process():
                     body: CreateMatchMessage = msgpack.unpackb(message.body)
-                    if body['event'] == 'create_match':
+                    if body['event'] == CreateMatchMessage.event:
                         await handle_event_create_match(body)
 
 async def main() -> None:

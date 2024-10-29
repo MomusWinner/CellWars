@@ -27,7 +27,7 @@ class Matchmaker:
             await queue.bind(exchange)
             await exchange.publish(
                 aio_pika.Message(
-                    msgpack.packb(CreateMatchMessage(event="create_match", user_ids=user_ids)),
+                    msgpack.packb(CreateMatchMessage.create(user_ids)),
                 ),
                 routing_key=queue_name,
             )

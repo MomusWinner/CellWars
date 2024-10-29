@@ -44,5 +44,5 @@ async def main() -> None:
                 async with message.process():
                     body: GetMatchMessage = msgpack.unpackb(message.body)
                     
-                    if body['event'] == 'get_match':
+                    if body['event'] == GetMatchMessage.event:
                         await handle_event_get_match(body)
