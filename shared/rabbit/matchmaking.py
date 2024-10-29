@@ -1,0 +1,2 @@
+MATCHES_QUEUE = "matches"
+MATCHES_EXCHANGE = "match"
