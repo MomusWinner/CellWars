@@ -17,17 +17,17 @@ async def handle_event_create_match(message: CreateMatchMessage):
     await redis.json().set(ROOM_KEY.format(room_id=str(room_id)), "$", {"test": "test_room"})
 
 
-    # async for user_id in user_ids:
-    #     queue_name = USER_QUEUE_KEY.format(user_id=user_id)
-    #     async with channel_pool.acquire() as channel:
-    #         channel: aio_pika.Channel
-    #         queue = await channel.declare_queue(queue_name, durable=True)
-    #         exchange = await channel.declare_exchange("user_message", aio_pika.ExchangeType.DIRECT, durable=True)
+    for user_id in user_ids:
+        queue_name = USER_QUEUE_KEY.format(user_id=user_id)
+        async with channel_pool.acquire() as channel:
+            channel: aio_pika.Channel
+            queue = await channel.declare_queue(queue_name, durable=True)
+            exchange = await channel.declare_exchange("user_message", aio_pika.ExchangeType.DIRECT, durable=True)
 
-    #         await queue.bind(exchange)
-    #         await exchange.publish(
-    #             aio_pika.Message(
-    #                 msgpack.packb(CreateMatchMessage(event="create_match", user_ids=user_ids)),
-    #             ),
-    #             routing_key=queue_name,
-    #         )
+            await queue.bind(exchange)
+            await exchange.publish(
+                aio_pika.Message(
+                    msgpack.packb(CreateMatchMessage(event="create_match", user_ids=user_ids)),
+                ),
+                routing_key=queue_name,
+            )
