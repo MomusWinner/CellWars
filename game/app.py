@@ -5,15 +5,14 @@ from game.storage.rabbit import channel_pool
 from game.storage.redis import setup_redis
 from shared.schema.messages.match import CreateMatchMessage
 from game.handlers.match import handle_event_create_match
-
+from shared.rabbit.matchmaking import CREATE_MATCH_QUEUE
 
 async def handle_matches():
-    queue_name = "create_matches"
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
 
         await channel.set_qos(prefetch_count=10)
-        queue = await channel.declare_queue(queue_name, durable=True)
+        queue = await channel.declare_queue(CREATE_MATCH_QUEUE, durable=True)
 
         async with queue.iterator() as queue_iter:
             async for message in queue_iter:

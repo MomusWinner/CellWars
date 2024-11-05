@@ -30,7 +30,7 @@ services:
       - 15672:15672
 
   redis:
-    image: redis:6.2.4
+    image: redis/redis-stack:latest
     ports:
       - "6379:6379"
 
