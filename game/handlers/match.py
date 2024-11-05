@@ -30,7 +30,6 @@ async def handle_event_create_match(message: CreateMatchMessage):
             await queue.bind(exchange)
             await exchange.publish(
                 aio_pika.Message(
-                    msgpack.packb(CreateMatchMessage.create(user_ids = user_ids)),
+                    msgpack.packb(RoomIdMessage.create(room_id=str(room_id))),
                 ),
-                routing_key=queue_name,
-            )
+                routing_key=queue_name,)
