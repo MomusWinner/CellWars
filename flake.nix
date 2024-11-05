@@ -16,7 +16,10 @@
             venvDir = ".venv";
             packages = with pkgs; [
               python311
+              sqlc
+              pyright
             ] ++ (with pkgs.python311Packages; [
+              greenlet
               pip
               venvShellHook
             ]);
