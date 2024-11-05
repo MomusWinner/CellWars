@@ -2,14 +2,14 @@ from .base import BaseMessage
 from uuid import UUID
 
 
-class GetMatchMessage(BaseMessage):
-    event = "get_match"
+class MatchMessage(BaseMessage):
+    event = "match_message"
+    action: str # search or stop_search
     user_id: int
 
     @classmethod
-    def create(cls, user_id: int):
-        return CreateMatchMessage(event=cls.event, user_ids=user_id)
-
+    def create(cls, action, user_id):
+        return MatchMessage(event=cls.event, action=action, user_id=user_id)
 
 class CreateMatchMessage(BaseMessage):
     event = "create_match"
@@ -26,4 +26,4 @@ class RoomIdMessage(BaseMessage):
 
     @classmethod
     def create(cls, room_id: str):
-        return CreateMatchMessage(event=cls.event, room_id=room_id)
+        return RoomIdMessage(event=cls.event, room_id=room_id)
