@@ -15,7 +15,7 @@ class Cell:
         self.game_object = game_object
 
 class Stats:
-    coins: int = 1000
+    coins: int = 20000
 
 
 class Player:
