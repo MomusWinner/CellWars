@@ -33,8 +33,6 @@ class GameObjectFabric:
             raise PositionIsAlreadyBusyException
         
         player = self.team_tag_to_player[team_tag]
-        if self.bank_price > player.stats.coins:
-            raise NotEnoughCoinsException
 
         cell: Cell = self.game_world.cells[position.x][position.y]
         cell.game_object = go.Castle(cell, self.game_world, player)
@@ -196,10 +194,10 @@ class Game:
             winner_castle: go.Castle = castles[0]
             return winner_castle.player
 
-user_id1 = 1234
-user_id2 = 5678
-game = Game(user_id1, user_id2)
-game.create_users_castle()
+# user_id1 = 1234
+# user_id2 = 5678
+# game = Game(user_id1, user_id2)
+# game.create_users_castle()
 
 # game.game_step({"command_name": "BUY_WARRIORS", "position":  {"x":1, "y":1}, "user_id":user_id1, "count": 10})
 # game.game_step({"command_name": "BUY_WARRIORS", "position": {"x":1, "y":3}, "user_id":user_id2, "count": 10})
