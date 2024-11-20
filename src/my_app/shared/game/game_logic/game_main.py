@@ -114,8 +114,7 @@ class Game:
         warriors: go.Warriors = self.game_world.get_object_by_position(move_from)
         if  warriors.player.team_tag != team_tag:
             raise GameObjectPermissionDeniedException
-        if not warriors.move(move_to):
-            raise IncorrectMovementPositionException
+        warriors.move(move_to)
 
     def build_bank(self, position: Position, team_tag: int):
         if not self.is_correct_spawn_zone(position, team_tag):
@@ -194,17 +193,17 @@ class Game:
             winner_castle: go.Castle = castles[0]
             return winner_castle.player
 
-# user_id1 = 1234
-# user_id2 = 5678
-# game = Game(user_id1, user_id2)
-# game.create_users_castle()
+user_id1 = 1234
+user_id2 = 5678
+game = Game(user_id1, user_id2)
+game.create_users_castle()
 
-# game.game_step({"command_name": "BUY_WARRIORS", "position":  {"x":1, "y":1}, "user_id":user_id1, "count": 10})
-# game.game_step({"command_name": "BUY_WARRIORS", "position": {"x":1, "y":3}, "user_id":user_id2, "count": 10})
-# game.game_step({"command_name": "MOVE_WARRIORS", "move_from":  {"x":1, "y":1}, "move_to":{"x":1, "y":3},"user_id":user_id1})
+game.game_step({"command_name": "BUY_WARRIORS", "position":  {"x":1, "y":1}, "user_id":user_id1, "count": 10})
+game.game_step({"command_name": "BUY_WARRIORS", "position": {"x":1, "y":3}, "user_id":user_id2, "count": 10})
+game.game_step({"command_name": "MOVE_WARRIORS", "move_from":  {"x":1, "y":1}, "move_to":{"x":1, "y":3},"user_id":user_id1})
 
-# game.game_world.print_cells()
-# player1 = game.team_tag_to_player[1]
-# player2 = game.team_tag_to_player[2]
-# print("user 1: " + str(player1.stats.coins))
-# print("user 2: " + str(player2.stats.coins))
+game.game_world.print_cells()
+player1 = game.team_tag_to_player[1]
+player2 = game.team_tag_to_player[2]
+print("user 1: " + str(player1.stats.coins))
+print("user 2: " + str(player2.stats.coins))
