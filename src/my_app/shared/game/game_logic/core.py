@@ -14,8 +14,9 @@ class Cell:
         self.position = position
         self.game_object = game_object
 
+
 class Stats:
-    coins: int = 1000
+    coins: int = 20000
 
 
 class Player:
@@ -35,7 +36,7 @@ class GameObject(ABC):
 
     def __str__(self) -> str:
         return f"GO {type(self).__name__}"
-    
+
 
 class GameWorld:
     def __init__(self, width: int, height: int, cells:list[list[Cell]] | None = None):
@@ -84,10 +85,6 @@ class GameWorld:
         game_object.cell = None
         self.cells[pos.x][pos.y].game_object = None
         print("Destroy " + type(game_object).__name__)
-
-    def get_world_data(self) -> dict:
-
-        return
 
     def print_cells(self):
         for y in range(self.height):
