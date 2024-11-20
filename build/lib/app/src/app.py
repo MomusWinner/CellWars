@@ -6,15 +6,15 @@ from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.redis import RedisStorage
 from fastapi import FastAPI
 
-from src.bot import setup_bot, setup_dp
-from src.bg_tasks import background_tasks
-from src.api.tg.router import router as tg_router
+from my_app.bot.bot import setup_bot, setup_dp
+from my_app.bot.bg_tasks import background_tasks
+from my_app.bot.api.tg.router import router as tg_router
 from config.settings import settings
-from src.api.v1.router import router as v1_router
-from src.storage.redis import setup_redis
-from src.handlers.callback.router import router as callback_router
-from src.handlers.command.router import router as command_router
-from src.handlers.message.router import router as message_router
+from my_app.bot.api.v1.router import router as v1_router
+from my_app.bot.storage.redis import setup_redis
+from my_app.bot.handlers.callback.router import router as callback_router
+from my_app.bot.handlers.command.router import router as command_router
+from my_app.bot.handlers.message.router import router as message_router
 
 
 async def lifespan(app: FastAPI) -> None:
@@ -33,12 +33,14 @@ async def lifespan(app: FastAPI) -> None:
 
     logging.getLogger("uvicorn").info('Ending lifespan')
 
+
 def create_app() -> FastAPI:
     app = FastAPI(docs_url='/swagger', lifespan=lifespan)
     app.include_router(v1_router, prefix='/v1', tags=['v1'])
     app.include_router(tg_router, prefix='/tg', tags=['tg'])
 
     return app
+
 
 async def start_polling():
     logging.info('Starting polling')
@@ -58,6 +60,7 @@ async def start_polling():
 
     logging.info('Dependencies launched')
     await dp.start_polling(bot)
+
 
 if __name__ == '__main__':
     if settings.BOT_WEBHOOK_URL:

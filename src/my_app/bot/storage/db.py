@@ -5,7 +5,7 @@ from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from typing_extensions import AsyncGenerator
 
-from config.settings import settings
+from my_app.config.settings import settings
 
 
 class CConnection(Connection):
