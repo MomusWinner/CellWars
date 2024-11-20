@@ -11,7 +11,7 @@ import asyncio
 
 async def main() -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
-    logger.info('Starting consumer...')
+    logger.info('Starting game server...')
     setup_redis()
     await asyncio.gather(
         asyncio.create_task(handle_matches()),
