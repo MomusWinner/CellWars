@@ -5,9 +5,9 @@ from fastapi.responses import ORJSONResponse
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from src.api.tg.router import router
-from src.bg_tasks import background_tasks
-from src.bot import get_dp, get_bot
+from my_app.bot.api.tg.router import router
+from my_app.bot.bg_tasks import background_tasks
+from my_app.bot.bot import get_dp, get_bot
 
 
 @router.post("/webhook")
