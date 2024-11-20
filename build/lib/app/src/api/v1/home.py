@@ -4,8 +4,8 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .router import router
-from src.storage.db import get_db
-from src.storage.rabbit import channel_pool
+from my_app.bot.storage.db import get_db
+from my_app.bot.storage.rabbit import channel_pool
 
 
 @router.get("/home")

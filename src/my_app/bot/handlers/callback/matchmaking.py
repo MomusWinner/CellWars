@@ -5,12 +5,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram import F
 
-from shared.schema.messages.match import MatchMessage, RoomIdMessage
-from src.handlers.buttons import CANCEL_MATCHMAKING_INLINE, MATCHMAKING_INLINE, STATS_INLINE
-from src.handlers.states.game import GameGroup
-from src.handlers.states.menu import MenuGroup
-from src.storage.rabbit import channel_pool
-from shared.rabbit.matchmaking import MATCHES_QUEUE, MATCHMAKER_MATCH_EXCHANGE, USER_QUEUE_KEY
+from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
+from my_app.bot.handlers.buttons import CANCEL_MATCHMAKING_INLINE, MATCHMAKING_INLINE, STATS_INLINE
+from my_app.bot.handlers.states.game import GameGroup
+from my_app.bot.handlers.states.menu import MenuGroup
+from my_app.bot.storage.rabbit import channel_pool
+from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE, MATCHMAKER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
 
 from .router import router
 
@@ -23,7 +23,6 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
     cancel = InlineKeyboardButton(
         text=CANCEL_MATCHMAKING_INLINE["text"], callback_data=CANCEL_MATCHMAKING_INLINE["callback_data"]
     )
-
     markup = InlineKeyboardMarkup(inline_keyboard=[[cancel]])
     user_id = (callback_query.from_user.id,)
 
@@ -41,11 +40,11 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
             routing_key=MATCHES_QUEUE,
         )
 
-        user_queue = await channel.declare_queue(USER_QUEUE_KEY.format(user_id=user_id[0]), durable=True)
+        user_queue = await channel.declare_queue(USER_MATCH_QUEUE_KEY.format(user_id=user_id[0]), durable=True)
         async with user_queue.iterator() as user_queue_iter:
             async for message in user_queue_iter:
                 async with message.process():
-                    body: RoomIdMessage = msgpack.unpackb(message.body)
+                    body: RoomCreatedMessage = msgpack.unpackb(message.body)
                     await callback_query.message.edit_text(f"Under construction. Room ID: {body['room_id']}")
                     await state.update_data({"room_id": body["room_id"]})
                 break
