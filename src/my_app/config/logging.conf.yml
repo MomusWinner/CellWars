@@ -3,15 +3,20 @@ disable_existing_loggers: no
 formatters:
   console_formatter_game:
     (): my_app.game.logger.ConsoleFormatter
-  # console_formatter_backend:
-  #   (): src.logger.ConsoleFormatter
+  console_formatter_bot:
+    (): my_app.bot.logger.ConsoleFormatter
+  console_formatter_matchmaker:
+    (): my_app.matchmaker.logger.ConsoleFormatter
 handlers:
-  # console_handler_backend:
-  #   class: logging.StreamHandler
-  #   formatter: console_formatter_backend
+  console_handler_bot:
+    class: logging.StreamHandler
+    formatter: console_formatter_bot
   console_handler_game:
     class: logging.StreamHandler
     formatter: console_formatter_game
+  console_handler_matchmaker:
+    class: logging.StreamHandler
+    formatter: console_formatter_matchmaker
 root:
   level: INFO
   handlers: [console_handler_game]
@@ -19,6 +24,14 @@ root:
     level: INFO
     propagate: no
     handlers: [console_handler_game]
+  'bot_logger':
+    level: INFO
+    propagate: no
+    handlers: [console_handler_bot]
+  'matchmaker_logger':
+    level: INFO
+    propagate: no
+    handlers: [console_handler_matchmaker]
   'uvicorn':
     level: INFO
     propagate: yes

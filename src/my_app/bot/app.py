@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import uvicorn
 
 from aiogram import Dispatcher, Bot
@@ -15,10 +14,12 @@ from my_app.bot.storage.redis import setup_redis
 from my_app.bot.handlers.callback.router import router as callback_router
 from my_app.bot.handlers.command.router import router as command_router
 from my_app.bot.handlers.message.router import router as message_router
-
+from my_app.bot.logger import logger, LOGGING_CONFIG
+import logging.config
 
 async def lifespan(app: FastAPI) -> None:
-    logging.getLogger("uvicorn").info('Starting lifespan')
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger.info('Starting bot')
 
     dp = Dispatcher()
     setup_dp(dp)
@@ -43,7 +44,9 @@ def create_app() -> FastAPI:
 
 
 async def start_polling():
-    logging.info('Starting polling')
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger.info('Starting bot')
+
     redis = setup_redis()
     storage = RedisStorage(redis=redis)
 
