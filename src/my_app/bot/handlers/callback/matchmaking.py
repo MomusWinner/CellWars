@@ -33,11 +33,9 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
         queue = await channel.declare_queue(MATCHES_QUEUE, durable=True)
-
         exchange = await channel.declare_exchange(MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
         await queue.bind(exchange)
-
         await exchange.publish(
             aio_pika.Message(msgpack.packb(MatchMessage.create(user_id=user_id[0], action="search"))),
             routing_key=MATCHES_QUEUE,
@@ -48,12 +46,8 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
             async for message in user_queue_iter:
                 async with message.process():
                     body: RoomIdMessage = msgpack.unpackb(message.body)
-                    print(body)
-
                     await callback_query.message.edit_text(f"Under construction. Room ID: {body['room_id']}")
-
                     await state.update_data({"room_id": body["room_id"]})
-
                 break
 
 
@@ -65,18 +59,14 @@ async def cancel_matchmaking(callback_query: CallbackQuery, state: FSMContext) -
     )
     stats = InlineKeyboardButton(text=STATS_INLINE["text"], callback_data=STATS_INLINE["callback_data"])
     markup = InlineKeyboardMarkup(inline_keyboard=[[matchmaking], [stats]])
-
     user_id = (callback_query.from_user.id,)
 
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
-
         queue = await channel.declare_queue(MATCHES_QUEUE, durable=True)
-
         exchange = await channel.declare_exchange(MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
         await queue.bind(exchange)
-
         await exchange.publish(
             aio_pika.Message(msgpack.packb(MatchMessage.create(user_id=user_id[0], action="stop_search"))),
             routing_key=MATCHES_QUEUE,
