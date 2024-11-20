@@ -6,10 +6,13 @@ from my_app.shared.schema.messages.match import MatchMessage
 from my_app.matchmaker.handlers.match import handle_event_get_match
 from my_app.matchmaker.matchmaker import Matchmaker
 from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE, MATCHMAKER_MATCH_EXCHANGE
-
+import logging.config
+from my_app.matchmaker.logger import LOGGING_CONFIG, logger
 
 
 async def main() -> None:
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger.info('Starting matchmaker')
     queue_name = MATCHES_QUEUE
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel

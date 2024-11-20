@@ -6,7 +6,7 @@ from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE, GAME_MATCH_EXCH
 from my_app.matchmaker.storage.rabbit import channel_pool
 
 from asyncio import Lock
-
+from my_app.matchmaker.logger import logger
 
 class Matchmaker:
     def __init__(self):
@@ -22,9 +22,9 @@ class Matchmaker:
         async with self._users_lock:
             if user_id in self._users_ids:
                 self._users_ids.remove(user_id)
-                print("remove User from matchmaker id: " + str(user_id))
+                logger.info("Remove User from matchmaker id: " + str(user_id))
             else:
-                print(f"no user with this id({user_id}) was found")
+                logger.warning(f"No user with this id({user_id}) was found")
 
     async def send_create_match_message(self, user_ids: list[int]):
         async with channel_pool.acquire() as channel:
@@ -43,6 +43,7 @@ class Matchmaker:
                 ),
                 routing_key=CREATE_MATCH_QUEUE,
             )
+            logger.info(f"Send create game match for users {user_ids}")
 
     async def create_match(self):
         async with self._users_lock:

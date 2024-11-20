@@ -1,4 +1,5 @@
 
+import logging
 import aio_pika
 import msgpack
 from my_app.shared.game.game_logic.game_exceptions import GameException
@@ -14,9 +15,8 @@ async def handle_game_event(message: GameMessage):
     game_info: GameInfoMessage = None
     room_id = message["room_id"]
     game = get_game(room_id)
-    print("start handling game:", room_id)
     if game is None: #TODO
-        print(f"room with id {room_id} is not defined in the room manager.")
+        logging.warning(f"room with id {room_id} is not defined in the room manager.")
         return
 
     try:
@@ -32,7 +32,7 @@ async def handle_game_event(message: GameMessage):
             game_info = GameInfoMessage.create(game_state, winner_id=winner_id)
     
     if game_info is None: #TODO
-        print(f"GAME_STATE {game.game_state} The game state was processed incorrectly.")
+        logging.error(f"GAME_STATE {game.game_state} The game state was processed incorrectly.")
         return
     
     user_ids = list(game.user_id_to_team_tag.keys())
