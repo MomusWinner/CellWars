@@ -1,4 +1,12 @@
+from typing_extensions import TypedDict
 from pydantic_settings import BaseSettings
+
+
+class Icons(TypedDict):
+    bank: str
+    castle: str
+    warrior: str
+    field: str
 
 
 class Settings(BaseSettings):
@@ -18,6 +26,19 @@ class Settings(BaseSettings):
 
     REDIS_HOST: str
     REDIS_PORT: str
+
+    ICONSR: Icons = {
+        "bank": '🏦',
+        "castle": '🏰',
+        "warrior": '🧑🏻‍🦯',
+        "field": '🌲',
+    }
+    ICONSB: Icons = {
+        "bank": '🏠',
+        "castle": '🏯',
+        "warrior": '🧑🏿‍🦯',
+        "field": '🌴',
+    }
 
     @property
     def db_url(self) -> str:
