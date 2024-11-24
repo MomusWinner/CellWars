@@ -5,7 +5,6 @@ from my_app.shared.game.game_logic.game_exceptions import *
 import my_app.shared.game.game_logic.game_objects as go
 from my_app.shared.game.game_logic.core import *
 
-
 class GameObjectFabric:
     warrior_price = 10
     bank_price = 50
@@ -67,7 +66,6 @@ class Game:
 
     def __init__(self, user_id1, user_id2):
         self.game_state = GameStates.INIT.value
-        self.game_world: GameWorld = GameWorld(self.width, self.height)
         self.user_id_to_team_tag: dict[int, int] = {
             user_id1: 1,
             user_id2: 2
@@ -76,6 +74,7 @@ class Game:
             1: Player(1, user_id1),
             2: Player(2, user_id2)
         }
+        self.game_world: GameWorld = GameWorld(width=self.width, height=self.height, player_by_tag=self.team_tag_to_player)
         self.go_factory = GameObjectFabric(self.game_world, self.team_tag_to_player)
         self.whose_step = 1
 
@@ -207,3 +206,8 @@ class Game:
 # player2 = game.team_tag_to_player[2]
 # print("user 1: " + str(player1.stats.coins))
 # print("user 2: " + str(player2.stats.coins))
+
+# game_world_json = get_game_world_json(game.game_world)
+# new_game_world = json_to_game_world(game_world_json)
+# print(new_game_world.player_by_tag[1].stats.coins)
+
