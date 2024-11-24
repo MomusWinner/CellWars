@@ -1,5 +1,6 @@
 import json
 from my_app.shared.game.game_logic.game_objects import *
+from my_app.shared.game.game_logic.core import *
 
 def get_game_world_json(game_world: GameWorld) -> str:
     def default(o):
@@ -19,7 +20,9 @@ def get_game_world_json(game_world: GameWorld) -> str:
 
 
 def json_to_game_world(json_string: str) -> GameWorld:
-    def hook(g_dict):
+    def hook(g_dict: dict):
+        if "__type__" not in g_dict.keys():
+            return g_dict
         match g_dict["__type__"]:
             case "Position":
                 return Position(g_dict["x"], g_dict["y"])
@@ -28,13 +31,26 @@ def json_to_game_world(json_string: str) -> GameWorld:
             case "Cell":
                 return Cell(g_dict["position"], g_dict["game_object"])
             case "GameWorld":
-                return GameWorld(g_dict["width"], g_dict["height"], g_dict["cells"])
+                player_by_tag: dict = g_dict["player_by_tag"]
+                keys = list(player_by_tag.keys())
+                for key in keys:
+                    player_by_tag[int(key)] = player_by_tag[key]
+                    player_by_tag.pop(key)
+
+                return GameWorld(g_dict["width"], g_dict["height"], g_dict["player_by_tag"], g_dict["cells"])
             case "Bank":
                 return Bank(None, game_world=None, player=g_dict["player"], hp=g_dict["hp"])
             case "Warriors":
                 return Warriors(None, None, player=g_dict["player"], count=g_dict["count"])
             case "Castle":
                 return Castle(None, None, g_dict["player"], g_dict["hp"])
+            case "Stats":
+                stats = Stats()
+                stats.coins = g_dict["coins"]
+                return stats
+            case _:
+                raise Exception("__type__ is not defined")
+
 
 
     game_world: GameWorld = json.loads(json_string, object_hook=hook)

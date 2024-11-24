@@ -39,10 +39,10 @@ class GameObject(ABC):
 
 
 class GameWorld:
-    def __init__(self, width: int, height: int, cells:list[list[Cell]] | None = None):
+    def __init__(self, width: int, height: int, player_by_tag: dict[int, Player], cells:list[list[Cell]] | None = None):
         self.width = width
         self.height = height
-
+        self.player_by_tag = player_by_tag
         if cells is None:
             self.cells = []
             for x in range(width):
