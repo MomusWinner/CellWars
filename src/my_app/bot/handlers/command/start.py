@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from my_app.bot.handlers.callback.router import router
 from my_app.bot.handlers.states.menu import MenuGroup
-from my_app.bot.messages.menu import start_menu
+from my_app.bot.replies.menu import start_menu
 
 
 @router.message(Command("start"))

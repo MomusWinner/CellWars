@@ -3,14 +3,14 @@ import msgpack
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from my_app.bot.composables.field import render_field
 from my_app.bot.composables.info import game_info
 from my_app.bot.handlers.buttons import CANCEL_MATCHMAKING_INLINE, MATCHMAKING_INLINE
 from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.handlers.states.menu import MenuGroup
-from my_app.bot.messages.game import search_match
-from my_app.bot.messages.menu import start_menu
+from my_app.bot.replies.game import search_match
+from my_app.bot.replies.menu import start_menu
 from my_app.bot.storage.rabbit import channel_pool
-from my_app.bot.utils.field import render_field
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
     json_to_game_world,
 )
