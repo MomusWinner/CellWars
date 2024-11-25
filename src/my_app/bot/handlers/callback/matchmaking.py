@@ -58,9 +58,9 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
                         await state.set_state(GameGroup.player_turn)
                     else:
                         await state.set_state(GameGroup.enemy_turn)
-
-                    field_markup = render_field(json_to_game_world(body["game_world"]), user_id)
-                    game_info_text = game_info(json_to_game_world(body["game_world"]), body["your_turn"])
+                    game_world = json_to_game_world(body["game_world"])
+                    field_markup = render_field(game_world)
+                    game_info_text = game_info(game_world, body["your_turn"])
 
                     await callback_query.message.edit_text(game_info_text, reply_markup=field_markup)
                     await state.update_data(room_id=body["room_id"])
@@ -87,8 +87,3 @@ async def cancel_matchmaking(callback_query: CallbackQuery, state: FSMContext) -
         )
 
     await callback_query.message.edit_text(text, reply_markup=markup)
-
-
-# @router.callback_query()
-# async def any_callback(callback_query: CallbackQuery) -> None:
-#     await callback_query.answer(callback_query.data)
