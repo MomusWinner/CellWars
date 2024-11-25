@@ -13,7 +13,6 @@ def get_game_world_json(game_world: GameWorld) -> str:
             o_dict = game_object
         else:
             o_dict = o.__dict__ 
-
         o_dict["__type__"] = type(o).__name__
         return o_dict
     return json.dumps(game_world, default = default)
@@ -46,7 +45,8 @@ def json_to_game_world(json_string: str) -> GameWorld:
                 return Castle(None, None, g_dict["player"], g_dict["hp"])
             case "Stats":
                 stats = Stats()
-                stats.coins = g_dict["coins"]
+                if "coins" in g_dict.keys():
+                    stats.coins = g_dict["coins"]
                 return stats
             case _:
                 raise Exception("__type__ is not defined")

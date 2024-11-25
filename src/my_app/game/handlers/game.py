@@ -43,6 +43,7 @@ async def handle_game_event(message: GameMessage):
 
     for user_id in user_ids:
         game_info["your_turn"] = game.is_user_turn(user_id)
+        game_info["your_tag"] = game.user_id_to_team_tag[user_id]
         queue_name = GAME_INFO_QUEUE.format(user_id=user_id)
         async with channel_pool.acquire() as channel:
             channel: aio_pika.Channel
