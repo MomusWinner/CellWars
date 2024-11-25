@@ -17,6 +17,7 @@
             packages = with pkgs; [
               python311
               sqlc
+              ruff
               pyright
             ] ++ (with pkgs.python311Packages; [
               greenlet
