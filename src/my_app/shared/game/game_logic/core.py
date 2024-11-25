@@ -16,7 +16,8 @@ class Cell:
 
 
 class Stats:
-    coins: int = 20000
+    def __init__(self):
+        self.coins = 20000
 
 
 class Player:
