@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from my_app.bot.handlers.buttons import MATCHMAKING_INLINE, STATS_INLINE
 
 
-async def start_menu() -> tuple[str, InlineKeyboardMarkup]:
+def start_menu() -> tuple[str, InlineKeyboardMarkup]:
     matchmaking = InlineKeyboardButton(
         text=MATCHMAKING_INLINE["text"], callback_data=MATCHMAKING_INLINE["callback_data"]
     )
