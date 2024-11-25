@@ -2,12 +2,18 @@ import aio_pika
 import msgpack
 from aiogram import F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-
-from my_app.bot.handlers.buttons import CANCEL_MATCHMAKING_INLINE, MATCHMAKING_INLINE, STATS_INLINE
+from aiogram.types import CallbackQuery, Message
+from my_app.bot.composables.info import game_info
+from my_app.bot.handlers.buttons import CANCEL_MATCHMAKING_INLINE, MATCHMAKING_INLINE
 from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.handlers.states.menu import MenuGroup
+from my_app.bot.messages.game import search_match
+from my_app.bot.messages.menu import start_menu
 from my_app.bot.storage.rabbit import channel_pool
+from my_app.bot.utils.field import render_field
+from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
+    json_to_game_world,
+)
 from my_app.shared.rabbit.matchmaking import (
     MATCHES_QUEUE,
     MATCHMAKER_MATCH_EXCHANGE,
@@ -17,61 +23,72 @@ from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
 
 from .router import router
 
+channel: aio_pika.Channel
+
 
 @router.callback_query(F.data == MATCHMAKING_INLINE["callback_data"])
 async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) -> None:
+    if not isinstance(callback_query.message, Message):
+        raise Exception("Wrong type for the callback query message:", type(callback_query.message))
+
     await state.set_state(GameGroup.matchmaking)
-    await state.set_data({"message": callback_query.message.message_id})
 
-    cancel = InlineKeyboardButton(
-        text=CANCEL_MATCHMAKING_INLINE["text"], callback_data=CANCEL_MATCHMAKING_INLINE["callback_data"]
-    )
-    markup = InlineKeyboardMarkup(inline_keyboard=[[cancel]])
-    user_id = (callback_query.from_user.id,)
+    user_id = callback_query.from_user.id
+    text, markup = search_match()
 
-    await callback_query.message.edit_text("Ищем матч", reply_markup=markup)
+    await callback_query.message.edit_text(text, reply_markup=markup)
     await callback_query.answer()
 
     async with channel_pool.acquire() as channel:
-        channel: aio_pika.Channel
         queue = await channel.declare_queue(MATCHES_QUEUE, durable=True)
         exchange = await channel.declare_exchange(MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
         await queue.bind(exchange)
         await exchange.publish(
-            aio_pika.Message(msgpack.packb(MatchMessage.create(user_id=user_id[0], action="search"))),
+            aio_pika.Message(msgpack.packb(MatchMessage.create(user_id=user_id, action="search"))),
             routing_key=MATCHES_QUEUE,
         )
 
-        user_queue = await channel.declare_queue(USER_MATCH_QUEUE_KEY.format(user_id=user_id[0]), durable=True)
+        user_queue = await channel.declare_queue(USER_MATCH_QUEUE_KEY.format(user_id=user_id), durable=True)
         async with user_queue.iterator() as user_queue_iter:
             async for message in user_queue_iter:
                 async with message.process():
                     body: RoomCreatedMessage = msgpack.unpackb(message.body)
-                    await callback_query.message.edit_text(f"Under construction. Room ID: {body['room_id']}")
-                    await state.update_data({"room_id": body["room_id"]})
+                    if body["your_turn"]:
+                        await state.set_state(GameGroup.player_turn)
+                    else:
+                        await state.set_state(GameGroup.enemy_turn)
+
+                    field_markup = render_field(json_to_game_world(body["game_world"]), user_id)
+                    game_info_text = game_info(json_to_game_world(body["game_world"]), body["your_turn"])
+
+                    await callback_query.message.edit_text(game_info_text, reply_markup=field_markup)
+                    await state.update_data(room_id=body["room_id"])
                 break
 
 
 @router.callback_query(F.data == CANCEL_MATCHMAKING_INLINE["callback_data"])
 async def cancel_matchmaking(callback_query: CallbackQuery, state: FSMContext) -> None:
+    if not isinstance(callback_query.message, Message):
+        raise Exception("Wrong type for the callback query message:", type(callback_query.message))
+
     await state.set_state(MenuGroup.start)
-    matchmaking = InlineKeyboardButton(
-        text=MATCHMAKING_INLINE["text"], callback_data=MATCHMAKING_INLINE["callback_data"]
-    )
-    stats = InlineKeyboardButton(text=STATS_INLINE["text"], callback_data=STATS_INLINE["callback_data"])
-    markup = InlineKeyboardMarkup(inline_keyboard=[[matchmaking], [stats]])
-    user_id = (callback_query.from_user.id,)
+    text, markup = start_menu()
+    user_id = callback_query.from_user.id
 
     async with channel_pool.acquire() as channel:
-        channel: aio_pika.Channel
         queue = await channel.declare_queue(MATCHES_QUEUE, durable=True)
         exchange = await channel.declare_exchange(MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
         await queue.bind(exchange)
         await exchange.publish(
-            aio_pika.Message(msgpack.packb(MatchMessage.create(user_id=user_id[0], action="stop_search"))),
+            aio_pika.Message(msgpack.packb(MatchMessage.create(user_id=user_id, action="stop_search"))),
             routing_key=MATCHES_QUEUE,
         )
 
-    await callback_query.message.edit_text('Привет!', reply_markup=markup)
+    await callback_query.message.edit_text(text, reply_markup=markup)
+
+
+# @router.callback_query()
+# async def any_callback(callback_query: CallbackQuery) -> None:
+#     await callback_query.answer(callback_query.data)
