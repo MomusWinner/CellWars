@@ -41,14 +41,7 @@ def rotate_counterclockwise(matrix: list[list[T]]) -> list[list[T]]:
     return list(zip(*matrix))[::-1]
 
 
-def rotate_field(field: list[list[Cell]], user_id: int) -> list[list[Cell]]:
-    current_tag = 1
-    if field[2][0].game_object.player.user_id != user_id:
-        current_tag = 2
-
-    rotated_field: list[list[Cell]]
-    if current_tag == 2:
-        rotated_field = rotate_clockwise(field)
-    else:
-        rotated_field = rotate_counterclockwise(field)
-    return rotated_field
+def rotate_field(field: list[list[Cell]], user_tag: int) -> list[list[Cell]]:
+    if user_tag == 2:
+        return rotate_clockwise(field)
+    return rotate_counterclockwise(field)
