@@ -1,34 +1,34 @@
+from asyncio import Lock
+
 import aio_pika
 import msgpack
 
-from my_app.shared.schema.messages.match import CreateMatchMessage
-from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE, GAME_MATCH_EXCHANGE
-from my_app.matchmaker.storage.rabbit import channel_pool
-
-from asyncio import Lock
 from my_app.matchmaker.logger import logger
+from my_app.matchmaker.storage.rabbit import channel_pool
+from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE, GAME_MATCH_EXCHANGE
+from my_app.shared.schema.messages.match import CreateMatchMessage
+
 
 class Matchmaker:
-    def __init__(self):
+    def __init__(self) -> None:
         self._users_ids: list[int] = []
         self._users_lock = Lock()
 
-    async def add_user(self, user_id: int):
+    async def add_user(self, user_id: int) -> None:
         async with self._users_lock:
             self._users_ids.append(user_id)
         await self.create_match()
 
-    async def remove_user(self, user_id: int):
+    async def remove_user(self, user_id: int) -> None:
         async with self._users_lock:
             if user_id in self._users_ids:
                 self._users_ids.remove(user_id)
                 logger.info("Remove User from matchmaker id: " + str(user_id))
             else:
-                logger.warning(f"No user with this id({user_id}) was found")
+                logger.warning("No user with this id(%s) was found", user_id)
 
-    async def send_create_match_message(self, user_ids: list[int]):
+    async def send_create_match_message(self, user_ids: list[int]) -> None:
         async with channel_pool.acquire() as channel:
-            channel: aio_pika.Channel
             queue = await channel.declare_queue(CREATE_MATCH_QUEUE, durable=True)
             exchange = await channel.declare_exchange(
                 GAME_MATCH_EXCHANGE,
@@ -43,9 +43,9 @@ class Matchmaker:
                 ),
                 routing_key=CREATE_MATCH_QUEUE,
             )
-            logger.info(f"Send create game match for users {user_ids}")
+            logger.info("Send create game match for users %s", user_ids)
 
-    async def create_match(self):
+    async def create_match(self) -> None:
         async with self._users_lock:
             while len(self._users_ids) >= 2:
                 first_user = self._users_ids.pop()
