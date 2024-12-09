@@ -1,19 +1,27 @@
-from my_app.shared.game.exception_codes import *
+from my_app.shared.game.exception_codes import (
+    COMMAND_NOT_FOUND,
+    GAME_OBJECT_PERMISSION_DENIED,
+    INCORRECT_MOVEMENT_POSITION,
+    INCORRECT_ZONE,
+    NOT_ENOUGH_COINS,
+    NOT_YOUR_STEP,
+    POSITION_ALREADY_BUSY,
+    START_CELL_MUST_CONTAIN_WARRIORS,
+    UNREGISTERED_USER_ID,
+)
+
 
 class GameException(Exception):
-    exception_code: str = -1
+    exception_code: int = -1
 
-    def __init__(self, *args):
-        if args:
-            self.message = args[0]
-        else:
-            self.message = None
+    def __init__(self, message: str | None = None) -> None:
+        self.message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.message:
-            return f'GameError CODE: {self.exception_code}; {self.message}'
+            return f"GameError CODE: {self.exception_code}; {self.message}"
         else:
-            return f'GameError CODE: {self.exception_code}'
+            return f"GameError CODE: {self.exception_code}"
 
 
 class PositionIsAlreadyBusyException(GameException):
@@ -25,7 +33,7 @@ class NotEnoughCoinsException(GameException):
 
 
 class UnregisteredUserIdException(GameException):
-    exception_code =  UNREGISTERED_USER_ID
+    exception_code = UNREGISTERED_USER_ID
 
 
 class GameObjectPermissionDeniedException(GameException):
@@ -46,6 +54,7 @@ class CommandNotFound(GameException):
 
 class IncorrectZone(GameException):
     exception_code = INCORRECT_ZONE
+
 
 class NotYourStep(GameException):
     exception_code = NOT_YOUR_STEP

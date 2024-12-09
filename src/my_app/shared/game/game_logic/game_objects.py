@@ -1,17 +1,19 @@
 from __future__ import annotations
 from my_app.shared.game.game_logic.core import GameObject, Position, GameWorld, Cell, Player
 from my_app.shared.game.game_logic.game_exceptions import IncorrectMovementPositionException
-from abc import ABC
+from abc import ABC, abstractmethod
+
 
 class Iterable(ABC):
-    def on_iter(self):
+    @abstractmethod
+    def on_iter(self) -> None:
         raise NotImplementedError("on_iter method is not implemented")
 
 
-class Vulnerable(GameObject):
+class Vulnerable(GameObject):  # type: ignore[misc]
     hp = 10
 
-    def __init__(self, cell, game_world, player):
+    def __init__(self, cell: Cell, game_world: GameWorld, player: Player) -> None:
         super().__init__(cell, game_world, player)
 
     def set_damage(self, damage: int) -> bool:
@@ -22,37 +24,43 @@ class Vulnerable(GameObject):
         self.hp -= damage
         return False
 
+    def on_destroy(self) -> None:
+        pass
+
 
 class Building(Vulnerable):
-    def __init__(self, cell, game_world, player, hp = 10):
+    def __init__(self, cell: Cell, game_world: GameWorld, player: Player, hp: int = 10) -> None:
         super().__init__(cell, game_world, player)
         self.hp = hp
 
 
 class Castle(Building):
-    def __init__(self, cell, game_world, player, hp = 100):
+    def __init__(self, cell: Cell, game_world: GameWorld, player: Player, hp: int = 100) -> None:
         super().__init__(cell, game_world, player, hp)
 
-    def on_destroy(self):
-        return super().on_destroy()
+    def on_destroy(self) -> None:
+        pass
 
 
 class Bank(Building, Iterable):
     coins_per_iter = 20
 
-    def __init__(self, cell, game_world, player, hp = 20):
+    def __init__(self, cell: Cell, game_world: GameWorld, player: Player, hp: int = 20) -> None:
         super().__init__(cell, game_world, player, hp)
 
-    def on_iter(self):
+    def on_iter(self) -> None:
         self.player.stats.coins += self.coins_per_iter
 
 
-class Warriors(GameObject):
+class Warriors(GameObject):  # type: ignore[misc]
     max_distance = 2
 
     def __init__(self, cell: Cell, game_world: GameWorld, player: Player, count: int):
         super().__init__(cell, game_world, player)
         self.count = count
+
+    def on_destroy(self) -> None:
+        pass
 
     def _change_position(self, position: Position) -> None:
         self.game_world.clean_cell(self.cell.position)
@@ -76,7 +84,7 @@ class Warriors(GameObject):
             self.game_world.destroy(self)
             self.game_world.destroy(other_warriors)
 
-    def _attack_vulnerable(self, vulnerable: Vulnerable):
+    def _attack_vulnerable(self, vulnerable: Vulnerable) -> None:
         v_pos = vulnerable.cell.position
         damage = 0
         if vulnerable.hp >= self.count:
@@ -92,7 +100,7 @@ class Warriors(GameObject):
         elif target_is_destroyed:
             self._change_position(v_pos)
 
-    def _move(self, target: Position):
+    def _move(self, target: Position) -> None:
         target_object = self.game_world.get_object_by_position(target)
         if target_object is None:
             self._change_position(target)
@@ -105,10 +113,10 @@ class Warriors(GameObject):
         else:
             raise IncorrectMovementPositionException
 
-    def move(self, target: Position):
-        if (self.game_world.distance(self.cell.position, target) > 2):
+    def move(self, target: Position) -> None:
+        if self.game_world.distance(self.cell.position, target) > 2:
             raise IncorrectMovementPositionException
-        
+
         target_object = self.game_world.get_object_by_position(target)
         if target_object is None:
             self._change_position(target)

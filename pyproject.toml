@@ -92,7 +92,7 @@ plugins = [
     "sqlalchemy.ext.mypy.plugin",
     "pydantic.mypy",
 ]
-strict_optional = true
+strict = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 check_untyped_defs = true
@@ -104,6 +104,7 @@ exclude = [
     "^tests/",
     "^utils/",
 ]
+disable_error_code = ["import-untyped"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
@@ -117,6 +118,6 @@ module = [
     "prometheus_client.*",
     "starlette_prometheus.*",
     "uvicorn.*",
+    "my_app.*"
 ]
 ignore_missing_imports = true
-
