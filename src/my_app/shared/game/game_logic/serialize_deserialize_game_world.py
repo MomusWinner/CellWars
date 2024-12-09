@@ -1,64 +1,68 @@
 import json
-from my_app.shared.game.game_logic.game_objects import *
-from my_app.shared.game.game_logic.core import *
+from typing import Any
 
-def get_game_world_json(game_world: GameWorld) -> str:
-    def default(o):
-        o_dict: dict = {}
+import my_app.shared.game.game_logic.core as core
+import my_app.shared.game.game_logic.game_objects as go
 
-        if isinstance(o, GameObject):
+
+def get_game_world_json(game_world: core.GameWorld) -> str:
+    def default(o: Any) -> Any:
+        o_dict: dict[Any, Any] = {}
+        if isinstance(o, go.GameObject):
             game_object = dict(o.__dict__)
             game_object.pop("game_world")
             game_object.pop("cell")
             o_dict = game_object
         else:
-            o_dict = o.__dict__ 
+            o_dict = o.__dict__
         o_dict["__type__"] = type(o).__name__
         return o_dict
-    return json.dumps(game_world, default = default)
+    return json.dumps(game_world, default=default)
 
 
-def json_to_game_world(json_string: str) -> GameWorld:
-    def hook(g_dict: dict):
+def json_to_game_world(json_string: str) -> core.GameWorld:
+    def hook(g_dict: dict[Any, Any]) -> Any:
         if "__type__" not in g_dict.keys():
             return g_dict
         match g_dict["__type__"]:
             case "Position":
-                return Position(g_dict["x"], g_dict["y"])
+                return core.Position(g_dict["x"], g_dict["y"])
             case "Player":
-                return Player(g_dict["team_tag"], g_dict["user_id"])
+                return core.Player(g_dict["team_tag"], g_dict["user_id"])
             case "Cell":
-                return Cell(g_dict["position"], g_dict["game_object"])
+                return core.Cell(g_dict["position"], g_dict["game_object"])
             case "GameWorld":
-                player_by_tag: dict = g_dict["player_by_tag"]
+                player_by_tag: dict[Any, Any] = g_dict["player_by_tag"]
                 keys = list(player_by_tag.keys())
                 for key in keys:
                     player_by_tag[int(key)] = player_by_tag[key]
                     player_by_tag.pop(key)
 
-                return GameWorld(g_dict["width"], g_dict["height"], g_dict["player_by_tag"], g_dict["cells"])
+                return core.GameWorld(
+                    g_dict["width"],
+                    g_dict["height"],
+                    g_dict["player_by_tag"],
+                    g_dict["cells"])
             case "Bank":
-                return Bank(None, game_world=None, player=g_dict["player"], hp=g_dict["hp"])
+                return go.Bank(None, game_world=None, player=g_dict["player"], hp=g_dict["hp"])
             case "Warriors":
-                return Warriors(None, None, player=g_dict["player"], count=g_dict["count"])
+                return go.Warriors(None, None, player=g_dict["player"], count=g_dict["count"])
             case "Castle":
-                return Castle(None, None, g_dict["player"], g_dict["hp"])
+                return go.Castle(None, None, g_dict["player"], g_dict["hp"])
             case "Stats":
-                stats = Stats()
-                if "coins" in g_dict.keys():
+                stats = core.Stats()
+                if "coins" in g_dict:
                     stats.coins = g_dict["coins"]
                 return stats
             case _:
                 raise Exception("__type__ is not defined")
 
-
-
-    game_world: GameWorld = json.loads(json_string, object_hook=hook)
+    game_world: core.GameWorld = json.loads(json_string, object_hook=hook)
 
     for x in range(game_world.width):
         for y in range(game_world.height):
             game_object = game_world.cells[x][y].game_object
-            if not isinstance(game_object, GameObject):
+            if not isinstance(game_object, go.GameObject):
                 continue
             game_object.cell = game_world.cells[x][y]
             game_object.game_world = game_world

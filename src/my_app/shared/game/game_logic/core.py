@@ -1,6 +1,6 @@
 from __future__ import annotations
-from abc import ABC
-import json
+
+from abc import ABC, abstractmethod
 
 
 class Position:
@@ -16,7 +16,7 @@ class Cell:
 
 
 class Stats:
-    def __init__(self):
+    def __init__(self) -> None:
         self.coins = 20000
 
 
@@ -26,12 +26,14 @@ class Player:
         self.team_tag = team_tag
         self.stats = Stats()
 
+
 class GameObject(ABC):
-    def __init__(self, cell: Cell, game_world: GameWorld, player: Player):
-        self.cell = cell
+    def __init__(self, cell: Cell, game_world: GameWorld, player: Player) -> None:
+        self.cell: Cell | None = cell
         self.game_world = game_world
         self.player = player
 
+    @abstractmethod
     def on_destroy(self) -> None:
         pass
 
@@ -40,7 +42,12 @@ class GameObject(ABC):
 
 
 class GameWorld:
-    def __init__(self, width: int, height: int, player_by_tag: dict[int, Player], cells:list[list[Cell]] | None = None):
+    def __init__(
+        self,
+        width: int,
+        height: int, player_by_tag: dict[int, Player],
+        cells: list[list[Cell]] | None = None
+    ):
         self.width = width
         self.height = height
         self.player_by_tag = player_by_tag
@@ -54,44 +61,49 @@ class GameWorld:
         else:
             self.cells = cells
 
-    def distance(self, position1: Position, position2: Position):
+    def distance(self, position1: Position, position2: Position) -> int:
         return abs(position1.x - position2.x) + abs(position1.y - position2.y)
 
     def get_object_by_position(self, position: Position) -> GameObject | None:
         return self.cells[position.x][position.y].game_object
 
-    def set_object_to_cell(self, position: Position, game_object: GameObject):
+    def set_object_to_cell(self, position: Position, game_object: GameObject) -> None:
         self.cells[position.x][position.y].game_object = game_object
         game_object.cell = self.cells[position.x][position.y]
 
-    def clean_cell(self, position: Position):
+    def clean_cell(self, position: Position) -> None:
         cell = self.cells[position.x][position.y]
-        if cell.game_object != None:
+        if cell.game_object is not None:
             cell.game_object = None
             self.cells[position.x][position.y].game_object = None
 
-    def find_objects_by_type(self, target_type: type):
-        game_objects = []
+    def find_objects_by_type(self, target_type: type) -> list[GameObject]:
+        game_objects: list[GameObject] = []
         for x in range(self.width):
             for y in range(self.height):
                 game_object = self.get_object_by_position(Position(x, y))
-                if type(game_object) == target_type:
+                if isinstance(game_object, target_type) and isinstance(game_object, GameObject):
                     game_objects.append(game_object)
-        
+
         return game_objects
 
-    def destroy(self, game_object: GameObject):
+    def destroy(self, game_object: GameObject) -> None:
         game_object.on_destroy()
+        if game_object.cell is None:
+            return
         pos = game_object.cell.position
         game_object.cell = None
         self.cells[pos.x][pos.y].game_object = None
         print("Destroy " + type(game_object).__name__)
 
-    def print_cells(self):
+    def print_cells(self) -> None:
         for y in range(self.height):
             line = ""
             for x in range(self.width):
-                game_object: GameObject = self.cells[x][y].game_object
+                cell = self.cells[x][y]
+                if cell is None:
+                    return
+                game_object = cell.game_object
                 line += type(game_object).__name__
                 if game_object is not None:
                     line += f"({game_object.player.team_tag})"

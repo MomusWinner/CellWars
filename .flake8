@@ -1,0 +1,19 @@
+[flake8]
+inline-quotes = double
+max-line-length=99
+max-local-variables=8
+max-complexity=8
+max-module-members=10
+max-line-complexity=18
+
+extend-ignore=
+        # encoding
+        C101,
+        # black brother
+        BLK100,
+per-file-ignores=
+        test_*.py:
+                # assert usage
+                S101,
+                # complex lines (ok for test data)
+        settings.py:

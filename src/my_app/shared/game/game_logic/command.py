@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import TypedDict
 
 
@@ -6,13 +7,15 @@ class PositionCommand(TypedDict):
     y: int
 
 
-class GameCommand(TypedDict):
+@dataclass
+class GameCommand:
     user_id: int
     command_name: str
 
+
 class MoveWarriorsCommand(GameCommand):
     command_name = "MOVE_WARRIORS"
-    move_from: PositionCommand 
+    move_from: PositionCommand
     move_to: PositionCommand
 
 
