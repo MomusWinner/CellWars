@@ -1,22 +1,22 @@
-
-import logging
 import aio_pika
 import msgpack
+
+from my_app.game.logger import logger
+from my_app.game.room_manager import get_game, get_game_world_json, send_command
+from my_app.game.storage.rabbit import channel_pool
 from my_app.shared.game.game_logic.game_exceptions import GameException
 from my_app.shared.game.game_logic.game_main import GameStates
-from my_app.shared.schema.messages.game import GameMessage, GameInfoMessage
-from my_app.game.room_manager import send_command, get_game_world_json, get_game
-from my_app.game.storage.rabbit import channel_pool
-from my_app.shared.rabbit.game import GAME_INFO_QUEUE, GAME_INFO_EXCHANGE
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import get_game_world_json
+from my_app.shared.rabbit.game import GAME_INFO_EXCHANGE, GAME_INFO_QUEUE
+from my_app.shared.schema.messages.game import GameInfoMessage, GameMessage
 
 
-async def handle_game_event(message: GameMessage):
+async def handle_game_event(message: GameMessage) -> None:
     game_info: GameInfoMessage = None
     room_id = message["room_id"]
     game = get_game(room_id)
-    if game is None: #TODO
-        logging.warning(f"room with id {room_id} is not defined in the room manager.")
+    if game is None:  # TODO
+        logger.warning("room with id %s is not defined in the room manager.", room_id)
         return
 
     try:
@@ -30,11 +30,11 @@ async def handle_game_event(message: GameMessage):
         elif game_state == GameStates.COMPLETE.value:
             winner_id = game.get_winner().user_id
             game_info = GameInfoMessage.create(game_state, winner_id=winner_id)
-    
-    if game_info is None: #TODO
-        logging.error(f"GAME_STATE {game.game_state} The game state was processed incorrectly.")
+
+    if game_info is None:  # TODO
+        logger.error("GAME_STATE %s The game state was processed incorrectly.", game.game_state)
         return
-    
+
     user_ids = list(game.user_id_to_team_tag.keys())
 
     if game_info["exception_code"] is not None:
@@ -45,8 +45,7 @@ async def handle_game_event(message: GameMessage):
         game_info["your_turn"] = game.is_user_turn(user_id)
         game_info["your_tag"] = game.user_id_to_team_tag[user_id]
         queue_name = GAME_INFO_QUEUE.format(user_id=user_id)
-        async with channel_pool.acquire() as channel:
-            channel: aio_pika.Channel
+        async with channel_pool.acquire() as channel:  # type aio_pika.Channel
             queue = await channel.declare_queue(queue_name, durable=True)
             exchange = await channel.declare_exchange(
                 GAME_INFO_EXCHANGE,

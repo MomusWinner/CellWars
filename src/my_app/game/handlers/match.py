@@ -1,19 +1,18 @@
 from uuid import UUID, uuid4
 
 import aio_pika
-import msgpack
-from redis import Redis
 
+from my_app.game.logger import logger
 from my_app.game.room_manager import create_room, send_command
 from my_app.game.storage.rabbit import channel_pool
 from my_app.shared.rabbit.matchmaking import USER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
 from my_app.shared.schema.messages.match import CreateMatchMessage, RoomCreatedMessage
 from my_app.shared.schema.redis.redis_keys import ROOM_KEY
-from my_app.game.logger import logger
 
-async def handle_event_create_match(message: CreateMatchMessage):
+
+async def handle_event_create_match(message: CreateMatchMessage) -> None:
     user_ids: list[int] = message["user_ids"]
-    room_id: UUID = str(uuid4())
+    room_id = str(uuid4())
     logger.info(F"ROOM UUID: {room_id}\ncreate room for user_ids: {user_ids}")
 
     game, game_world = create_room(room_id=room_id, user_id1=user_ids[0], user_id2=user_ids[1])

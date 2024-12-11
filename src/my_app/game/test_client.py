@@ -7,7 +7,11 @@ from aio_pika.exceptions import QueueEmpty
 from my_app.game.storage.rabbit import channel_pool
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import json_to_game_world
 from my_app.shared.rabbit.game import GAME_EXCHANGE, GAME_INFO_QUEUE, GAME_QUEUE
-from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE, MATCHMAKER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
+from my_app.shared.rabbit.matchmaking import (
+    MATCHES_QUEUE,
+    MATCHMAKER_MATCH_EXCHANGE,
+    USER_MATCH_QUEUE_KEY,
+)
 from my_app.shared.schema.messages.game import GameInfoMessage, GameMessage
 from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
 
@@ -16,7 +20,7 @@ user_id2 = 222
 room_id = ""
 
 
-async def send_test_search_data(user_id:str, action: str = "search"):
+async def send_test_search_data(user_id: str, action: str = "search") -> None:
     queue_name = MATCHES_QUEUE
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel

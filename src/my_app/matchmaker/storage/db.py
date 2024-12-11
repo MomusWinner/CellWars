@@ -13,7 +13,7 @@ from typing_extensions import AsyncGenerator
 from my_app.config.settings import settings
 
 
-class CConnection(Connection):  # type: ignore[misc]
+class CConnection(Connection):
     def _get_unique_id(self, prefix: str) -> str:
         return f"__asyncpg_{prefix}_{uuid4()}__"
 
