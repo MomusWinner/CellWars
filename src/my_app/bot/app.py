@@ -4,6 +4,7 @@ import logging.config
 import uvicorn
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.fsm.strategy import FSMStrategy
 from fastapi import FastAPI
 
 from my_app.bot.api.tg.router import router as tg_router
@@ -20,7 +21,7 @@ from my_app.config.settings import settings
 
 async def lifespan(app: FastAPI) -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
-    logger.info('Starting bot')
+    logger.info("Starting bot")
 
     dp = Dispatcher()
     setup_dp(dp)
@@ -33,25 +34,28 @@ async def lifespan(app: FastAPI) -> None:
     while background_tasks:
         await asyncio.sleep(0)
 
-    logging.getLogger("uvicorn").info('Ending lifespan')
+    logging.getLogger("uvicorn").info("Ending lifespan")
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(docs_url='/swagger', lifespan=lifespan)
-    app.include_router(v1_router, prefix='/v1', tags=['v1'])
-    app.include_router(tg_router, prefix='/tg', tags=['tg'])
+    app = FastAPI(docs_url="/swagger", lifespan=lifespan)
+    app.include_router(v1_router, prefix="/v1", tags=["v1"])
+    app.include_router(tg_router, prefix="/tg", tags=["tg"])
 
     return app
 
 
 async def start_polling():
     logging.config.dictConfig(LOGGING_CONFIG)
-    logger.info('Starting bot')
+    logger.info("Starting bot")
 
     redis = setup_redis()
     storage = RedisStorage(redis=redis)
 
-    dp = Dispatcher(storage=storage)
+    dp = Dispatcher(
+        storage=storage,
+        fsm_strategy=FSMStrategy.GLOBAL_USER,
+    )
 
     setup_dp(dp)
     bot = Bot(token=settings.BOT_TOKEN)
@@ -62,14 +66,14 @@ async def start_polling():
     dp.include_router(callback_router)
     await bot.delete_webhook()
 
-    logging.info('Dependencies launched')
+    logging.info("Dependencies launched")
     await dp.start_polling(bot)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if settings.BOT_WEBHOOK_URL:
         logging.info("Start webhook")
-        uvicorn.run('src.app:create_app', factory=True, host='0.0.0.0', port=8000, workers=1)
+        uvicorn.run("src.app:create_app", factory=True, host="0.0.0.0", port=8000, workers=1)
     else:
         logging.info("Start polling")
         asyncio.run(start_polling())
