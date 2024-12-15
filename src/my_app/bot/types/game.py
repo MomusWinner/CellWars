@@ -1,7 +1,4 @@
-from dataclasses import dataclass, field
-
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from my_app.bot.composables import actions
 
 
 class GameMessage:

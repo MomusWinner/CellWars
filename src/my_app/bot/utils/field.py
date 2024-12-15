@@ -1,14 +1,10 @@
 from typing import TypeVar
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from my_app.bot.types.callbacks import FieldCallback
+from aiogram.types import InlineKeyboardButton
+from my_app.bot.types.callbacks import FieldCallback, PlacementCallback
 from my_app.config.settings import settings
-from my_app.shared.game.game_logic.core import Cell, GameObject, GameWorld
+from my_app.shared.game.game_logic.core import Cell, GameObject
 from my_app.shared.game.game_logic.game_objects import Bank, Castle, Warriors
-from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
-    json_to_game_world,
-)
-from my_app.shared.schema.messages.match import RoomCreatedMessage
 
 T = TypeVar("T")
 

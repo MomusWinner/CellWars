@@ -12,16 +12,11 @@ from my_app.bot.handlers.states.menu import MenuGroup
 from my_app.bot.replies.game import search_match
 from my_app.bot.replies.menu import start_menu
 from my_app.bot.storage.rabbit import channel_pool
-from my_app.bot.types.game import GameMessage
-from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
-    json_to_game_world,
-)
 from my_app.shared.rabbit.matchmaking import (
     MATCHES_QUEUE,
     MATCHMAKER_MATCH_EXCHANGE,
-    USER_MATCH_QUEUE_KEY,
 )
-from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
+from my_app.shared.schema.messages.match import MatchMessage
 
 from .router import router
 
