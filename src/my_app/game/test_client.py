@@ -5,6 +5,7 @@ import msgpack
 from aio_pika.exceptions import QueueEmpty
 
 from my_app.game.storage.rabbit import channel_pool
+from my_app.shared.game.game_logic.command import GameCommand
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import json_to_game_world
 from my_app.shared.rabbit.game import GAME_EXCHANGE, GAME_INFO_QUEUE, GAME_QUEUE
 from my_app.shared.rabbit.matchmaking import (
@@ -20,7 +21,11 @@ user_id2 = 222
 room_id = ""
 
 
+<<<<<<< HEAD
 async def send_test_search_data(user_id: str, action: str = "search") -> None:
+=======
+async def send_test_search_data(user_id: int, action: str = "search") -> None:
+>>>>>>> dev
     queue_name = MATCHES_QUEUE
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
@@ -38,7 +43,7 @@ async def send_test_search_data(user_id: str, action: str = "search") -> None:
         )
 
 
-async def send_game_message(command, room_id):
+async def send_game_message(command: GameCommand, room_id: str) -> None:
     async with channel_pool.acquire() as channel:
             channel: aio_pika.Channel
             queue = await channel.declare_queue(GAME_QUEUE, durable=True)
@@ -57,9 +62,9 @@ async def send_game_message(command, room_id):
             )
 
 
-async def read_game_response(user_id):
-    print(f"@--{user_id}: read message. QUEUE: {GAME_INFO_QUEUE}")
-    queue_name = GAME_INFO_QUEUE.format(user_id=user_id)
+async def read_game_response() -> None:
+    print(f"@--: read message. QUEUE: {GAME_INFO_QUEUE}")
+    queue_name = GAME_INFO_QUEUE
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
         await channel.set_qos(prefetch_count=10)
@@ -74,7 +79,7 @@ async def read_game_response(user_id):
                     if body['event'] == GameInfoMessage.event:
                         print(f"  game_state: {body["game_state"]}")
                         print(f"  winner_id: {body["winner_id"]}")
-                        print(f"  your_turn: ", body["your_turn"])
+                        print(f"  your_turn: ", body["user_id_turn"])
                         print(f"  exception_code: {body["exception_code"]}")
                         game_world = body["game_world"]
                         if game_world is not None:
@@ -86,9 +91,9 @@ async def read_game_response(user_id):
                 break
 
 
-async def read_match_create_response(user_id):
-    print(f"@--{user_id}: read message. QUEUE: {USER_MATCH_QUEUE_KEY}")
-    queue_name = USER_MATCH_QUEUE_KEY.format(user_id=user_id)
+async def read_match_create_response() -> None:
+    print(f"@--: read message. QUEUE: {USER_MATCH_QUEUE_KEY}")
+    queue_name = USER_MATCH_QUEUE_KEY
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
         await channel.set_qos(prefetch_count=10)
@@ -101,7 +106,7 @@ async def read_match_create_response(user_id):
                 async with message.process():
                     body: RoomCreatedMessage = msgpack.unpackb(message.body)
                     if body['event'] == RoomCreatedMessage.event:
-                        print("  your turn:", body["your_turn"])
+                        print("  user id turn:", body["user_id_turn"])
                         print("  game_world:", body["game_world"] is not None)
                         print("  room_id:", body["room_id"])
             except QueueEmpty:
@@ -110,42 +115,34 @@ async def read_match_create_response(user_id):
                 break
 
 
-async def run():
+async def run() -> None:
     await send_test_search_data(user_id1)
     await send_test_search_data(user_id2)
     room_id = input("room_id: ")
-    await read_match_create_response(user_id1)
-    await read_match_create_response(user_id2)
+    await read_match_create_response()
 
     command2 = {"command_name": "BUY_WARRIORS", "position":  {"x":1, "y":1}, "user_id":user_id2, "count": 1000}
     await send_game_message(command2, room_id)
-    await read_game_response(user_id1)
-    await read_game_response(user_id2)
+    await read_game_response()
 
     await asyncio.sleep(1)
     command = {"command_name": "BUY_WARRIORS", "position": {"x":1, "y":3}, "user_id":user_id1, "count": 10}
     await send_game_message(command, room_id)
-    await read_game_response(user_id1)
-    await read_game_response(user_id2)
+    await read_game_response()
 
     await asyncio.sleep(1)
     command2 = {"command_name": "MOVE_WARRIORS", "move_from":  {"x":1, "y":1}, "move_to":{"x":1, "y":3},"user_id":user_id2}
     await send_game_message(command2, room_id)
-    await read_game_response(user_id1)
-    await read_game_response(user_id2)
-
+    await read_game_response()
 
     await asyncio.sleep(1)
     command = {"command_name": "BUY_WARRIORS", "position": {"x":3, "y":3}, "user_id":user_id1, "count": 10}
     await send_game_message(command, room_id)
-    await read_game_response(user_id1)
-    await read_game_response(user_id2)
-
+    await read_game_response()
 
     await asyncio.sleep(1)
     command2 = {"command_name": "MOVE_WARRIORS", "move_from":  {"x":1, "y":3}, "move_to":{"x":2, "y":4},"user_id":user_id2}
     await send_game_message(command2, room_id)
-    await read_game_response(user_id1)
-    await read_game_response(user_id2)
+    await read_game_response()
 
 asyncio.run(run())

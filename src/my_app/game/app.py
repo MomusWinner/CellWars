@@ -1,6 +1,12 @@
 import asyncio
 import logging.config
 
+<<<<<<< HEAD
+=======
+import aio_pika
+import msgpack
+
+>>>>>>> dev
 from my_app.game.handlers.game_queue_handler import handle_games
 from my_app.game.handlers.match_queue_handler import handle_matches
 from my_app.game.logger import LOGGING_CONFIG, logger
