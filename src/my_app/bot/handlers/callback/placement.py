@@ -11,11 +11,14 @@ from my_app.bot.handlers.buttons import (
     PLACE_BANK_INLINE,
     PLACE_WARRIORS_INLINE,
 )
+from my_app.bot.storage.rabbit import channel_pool
 from my_app.bot.types.callbacks import PlacementCallback
-from my_app.bot.types.game import GameMessage
+from my_app.bot.types.game import GameTGMessage
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
     json_to_game_world,
 )
+from my_app.shared.rabbit.game import GAME_EXCHANGE, GAME_QUEUE
+from my_app.shared.schema.messages.game import GameMessage
 
 from .router import router
 
@@ -33,7 +36,7 @@ async def warrior_placement_intent_handler(
     if reply_markup is None or message.text is None:
         return
 
-    game_message = GameMessage.from_markup(message.text, reply_markup)
+    game_message = GameTGMessage.from_markup(message.text, reply_markup)
     available_places = render_available_warrior_placements(game_message)
 
     game_message.actions = []
@@ -55,7 +58,7 @@ async def bank_placement_intent_handler(
     if reply_markup is None or message.text is None:
         return
 
-    game_message = GameMessage.from_markup(message.text, reply_markup)
+    game_message = GameTGMessage.from_markup(message.text, reply_markup)
     available_places = render_available_bank_placements(game_message)
 
     game_message.actions = []
@@ -84,6 +87,6 @@ async def cancel_placement_handler(
 
     field_buttons = render_field(game_world, user_tag)
 
-    with_actions = add_field_actions(GameMessage.from_field(field_buttons))
+    with_actions = add_field_actions(GameTGMessage.from_field(field_buttons))
 
     await message.edit_reply_markup(reply_markup=with_actions.export_markup())

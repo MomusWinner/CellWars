@@ -8,7 +8,7 @@ from my_app.bot.composables.field import render_field
 from my_app.bot.composables.info import game_info
 from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.storage.rabbit import channel_pool
-from my_app.bot.types.game import GameMessage
+from my_app.bot.types.game import GameTGMessage
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
     json_to_game_world,
 )
@@ -41,11 +41,11 @@ async def listen_matches(bot: Bot, storage: BaseStorage):
                         if player.user_id == body["user_id_turn"]:
                             await state.set_state(GameGroup.player_turn)
                             field_markup = add_field_actions(
-                                GameMessage.from_field(render_field(game_world, tag))
+                                GameTGMessage.from_field(render_field(game_world, tag))
                             )
                         else:
                             await state.set_state(GameGroup.enemy_turn)
-                            field_markup = GameMessage.from_field(
+                            field_markup = GameTGMessage.from_field(
                                 render_field(game_world, tag)
                             )
 
