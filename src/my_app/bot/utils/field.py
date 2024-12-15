@@ -1,7 +1,7 @@
 from typing import TypeVar
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from my_app.bot.handlers.buttons import FieldCallback
+from my_app.bot.types.callbacks import FieldCallback
 from my_app.config.settings import settings
 from my_app.shared.game.game_logic.core import Cell, GameObject, GameWorld
 from my_app.shared.game.game_logic.game_objects import Bank, Castle, Warriors
@@ -45,3 +45,32 @@ def rotate_field(field: list[list[Cell]], user_tag: int) -> list[list[Cell]]:
     if user_tag == 2:
         return rotate_clockwise(field)
     return rotate_counterclockwise(field)
+
+
+def map_available_placements(
+    buttons: list[list[InlineKeyboardButton]], places: list[str]
+) -> list[list[InlineKeyboardButton]]:
+    for y in range(len(buttons)):
+        if y < 3:
+            continue
+
+        for x in range(len(buttons[y])):
+            callback_data = buttons[y][x].callback_data
+            if callback_data is None:
+                raise Exception("no callback data")
+
+            field_callback = FieldCallback.unpack(callback_data)
+            if field_callback.type in places:
+                continue
+
+            icon = buttons[y][x].text + "🟢"
+
+            buttons[y][x] = InlineKeyboardButton(
+                text=icon,
+                callback_data=PlacementCallback(
+                    cell_x=field_callback.cell_x,
+                    cell_y=field_callback.cell_y,
+                    type=field_callback.type,
+                ).pack(),
+            )
+    return buttons
