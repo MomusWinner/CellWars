@@ -40,6 +40,8 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
 
     await callback_query.message.edit_text(text, reply_markup=markup)
     await callback_query.answer()
+    await state.update_data(message_id=callback_query.message.message_id)
+    await state.update_data(chat_id=callback_query.message.chat.id)
 
     channel: aio_pika.Channel
     async with channel_pool.acquire() as channel:
