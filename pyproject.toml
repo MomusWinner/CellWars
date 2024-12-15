@@ -129,3 +129,9 @@ module = [
     "my_app.*"
 ]
 ignore_missing_imports = true
+
+[tool.basedpyright]
+reportUnusedCallResult = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
