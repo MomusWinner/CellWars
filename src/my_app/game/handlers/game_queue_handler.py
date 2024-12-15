@@ -1,10 +1,11 @@
 import aio_pika
 import msgpack
 
-from my_app.game.storage.rabbit import channel_pool
-from my_app.shared.schema.messages.game import GameMessage
 from my_app.game.handlers.game import handle_game_event
+from my_app.game.storage.rabbit import channel_pool
 from my_app.shared.rabbit.game import GAME_QUEUE
+from my_app.shared.schema.messages.game import GameMessage
+
 
 async def handle_games():
     async with channel_pool.acquire() as channel:
