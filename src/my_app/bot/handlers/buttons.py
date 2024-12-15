@@ -1,22 +1,31 @@
-from aiogram.filters.callback_data import CallbackData
+from my_app.bot.types.button_info import ActionButtonInfo, MenuButtonInfo
 
-MATCHMAKING_INLINE = {
-    "text": "Начать поиск матча",
-    "callback_data": "matchmake",
-}
+MATCHMAKING_INLINE = MenuButtonInfo(
+    text="Начать поиск матча",
+    callback_data="matchmake",
+)
 
-STATS_INLINE = {
-    "text": "Посмотреть статистику",
-    "callback_data": "stats",
-}
+STATS_INLINE = MenuButtonInfo(
+    text="Посмотреть статистику",
+    callback_data="stats",
+)
 
-CANCEL_MATCHMAKING_INLINE = {
-    "text": "Отмена",
-    "callback_data": "cancel_matchmaking",
-}
+CANCEL_MATCHMAKING_INLINE = ActionButtonInfo(
+    text="Отмена",
+    callback_data="cancel_matchmaking",
+)
 
+PLACE_WARRIORS_INLINE = ActionButtonInfo(
+    text="Поставить войнов",
+    callback_data="place_warriors",
+)
 
-class FieldCallback(CallbackData, prefix="field"):
-    cell_x: int
-    cell_y: int
-    type: str
+PLACE_BANK_INLINE = ActionButtonInfo(
+    text="Поставить банк",
+    callback_data="place_bank",
+)
+
+CANCEL_FIELD_INLINE = ActionButtonInfo(
+    text="Отмена",
+    callback_data="cancel_field",
+)
