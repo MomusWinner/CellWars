@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 from my_app.bot.types.callbacks import FieldCallback
+from my_app.bot.types.game import GameMessage
 from my_app.bot.utils.field import (
     get_icon,
     get_type,
@@ -36,15 +37,19 @@ def render_field(
 
 
 def render_available_warrior_placements(
-    field: list[list[InlineKeyboardButton]],
-) -> list[list[InlineKeyboardButton]]:
-    return map_available_placements(field, ["castle", "bank"])
+    message: GameMessage,
+) -> GameMessage:
+    new_field = map_available_placements(message.field, ["castle", "bank"])
+    message.field = new_field
+    return message
 
 
 def render_available_bank_placements(
-    field: list[list[InlineKeyboardButton]],
-) -> list[list[InlineKeyboardButton]]:
-    return map_available_placements(field, ["castle", "bank", "warrior"])
+    message: GameMessage,
+) -> GameMessage:
+    new_field = map_available_placements(message.field, ["castle", "bank", "warrior"])
+    message.field = new_field
+    return message
 
 
 # def render_available_moves(buttons: list[list[InlineKeyboardButton]], x: int, y: int) -> list[list[InlineKeyboardButton]]
