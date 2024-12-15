@@ -1,10 +1,11 @@
 import aio_pika
 import msgpack
 
-from my_app.game.storage.rabbit import channel_pool
-from my_app.shared.schema.messages.match import CreateMatchMessage
 from my_app.game.handlers.match import handle_event_create_match
+from my_app.game.storage.rabbit import channel_pool
 from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE
+from my_app.shared.schema.messages.match import CreateMatchMessage
+
 
 async def handle_matches():
     async with channel_pool.acquire() as channel:

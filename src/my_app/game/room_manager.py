@@ -2,7 +2,6 @@ from my_app.shared.game.game_logic.game_exceptions import GameException
 from my_app.shared.game.game_logic.game_main import Game, GameStates
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import get_game_world_json
 
-
 rooms: dict[str, Game] = {}
 
 

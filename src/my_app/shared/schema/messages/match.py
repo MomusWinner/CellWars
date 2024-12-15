@@ -11,7 +11,7 @@ class MatchMessage(BaseMessage):
         return MatchMessage(event=cls.event, action=action, user_id=user_id)
 
 
-class CreateMatchMessage(BaseMessage):
+class CreateMatchMessage(BaseMessage): # send to game server
     event = "create_match"
     user_ids : list[int]
 
@@ -23,10 +23,10 @@ class CreateMatchMessage(BaseMessage):
 class RoomCreatedMessage(BaseMessage):
     event = "room_id"
     room_id: str
-    your_turn: bool
+    user_id_turn: int  # user tg id
     game_world: str
 
     @classmethod
-    def create(cls, room_id: str, game_world: str, your_turn: bool):
+    def create(cls, room_id: str, game_world: str, user_id_turn: int):
         return RoomCreatedMessage(event=cls.event, room_id=room_id,
-                game_world=game_world, your_turn=your_turn)
+                game_world=game_world, user_id_turn=user_id_turn)
