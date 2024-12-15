@@ -1,11 +1,18 @@
 from aiogram.types import InlineKeyboardButton
-from my_app.bot.handlers.buttons import FieldCallback
-from my_app.bot.utils.field import get_icon, get_type, rotate_field
+from my_app.bot.types.callbacks import FieldCallback
+from my_app.bot.utils.field import (
+    get_icon,
+    get_type,
+    map_available_placements,
+    rotate_field,
+)
 from my_app.shared.game.game_logic.core import GameWorld
 
 
-def render_field(game_world: GameWorld) -> list[list[InlineKeyboardButton]]:
-    field = rotate_field(game_world.cells, game_world.player_by_tag[0])
+def render_field(
+    game_world: GameWorld, user_tag: int
+) -> list[list[InlineKeyboardButton]]:
+    field = rotate_field(game_world.cells, user_tag)
 
     field_markup: list[list[InlineKeyboardButton]] = []
     for row_idx, row in enumerate(field):
@@ -28,6 +35,16 @@ def render_field(game_world: GameWorld) -> list[list[InlineKeyboardButton]]:
     return field_markup
 
 
+def render_available_warrior_placements(
+    field: list[list[InlineKeyboardButton]],
+) -> list[list[InlineKeyboardButton]]:
+    return map_available_placements(field, ["castle", "bank"])
+
+
+def render_available_bank_placements(
+    field: list[list[InlineKeyboardButton]],
+) -> list[list[InlineKeyboardButton]]:
+    return map_available_placements(field, ["castle", "bank", "warrior"])
+
+
 # def render_available_moves(buttons: list[list[InlineKeyboardButton]], x: int, y: int) -> list[list[InlineKeyboardButton]]
-# def render_available_warrior_placements(buttons: list[list[InlineKeyboardButton]], x: int, y: int) -> list[list[InlineKeyboardButton]]
-# def render_available_bank_placements(buttons: list[list[InlineKeyboardButton]], x: int, y: int) -> list[list[InlineKeyboardButton]]
