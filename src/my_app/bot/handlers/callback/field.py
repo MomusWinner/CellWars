@@ -2,9 +2,14 @@ import aio_pika
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-from my_app.bot.handlers.buttons import FieldCallback
+
+# from my_app import game
+from my_app.bot.composables.info import game_info
+from my_app.bot.handlers.states.game import GameGroup
+from my_app.bot.types.callbacks import FieldCallback
 from my_app.bot.utils.field import rotate_field
-from my_app.shared.game.game_logic.core import Player
+
+# from my_app.shared.game.game_logic.core import Player
 from my_app.shared.game.game_logic.game_objects import Castle
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
     json_to_game_world,
@@ -22,7 +27,7 @@ channel: aio_pika.Channel
 CASTLE_TEXT = "\nВыбран Замок:\n  Тип: {type}\n  ХП: {hp}"
 
 
-@router.callback_query(FieldCallback.filter(F.type == "castle"))
+@router.callback_query(FieldCallback.filter(F.type == "castle"), GameGroup.player_turn)
 async def castle_handler(
     callback_query: CallbackQuery, callback_data: FieldCallback, state: FSMContext
 ) -> None:
@@ -31,29 +36,35 @@ async def castle_handler(
         return
 
     message = callback_query.message
-    main_message = message.reply_to_message
     user_id = callback_query.from_user.id
-    if not isinstance(main_message, Message) or not isinstance(main_message.text, str):
-        await callback_query.answer("that's not right")
-        return
 
     cell_x = callback_data.cell_x
     cell_y = callback_data.cell_y
 
     data = await state.get_data()
-    game_world = json_to_game_world(data["game_world"])
-    users_field = rotate_field(game_world.cells, user_id)
+    game_world_json: str = data["game_world"]
+    game_world = json_to_game_world(game_world_json)
+    user_tag: int = data["user_tag"]
+    users_field = rotate_field(game_world.cells, user_tag)
     castle = users_field[cell_y][cell_x].game_object
-    if not isinstance(castle, Castle) or not isinstance(castle.player, Player):
+    if not isinstance(castle, Castle):
         await callback_query.answer("oh")
         return
+
     player = castle.player
+
     if player.user_id == user_id:
         type = "Союзник"
     else:
         type = "Вражеский"
 
-    await main_message.edit_text(
-        main_message.text.split("\n")[0] + CASTLE_TEXT.format(type=type, hp=castle.hp)
+    await message.edit_text(
+        game_info(game_world, True) + CASTLE_TEXT.format(type=type, hp=castle.hp),
+        reply_markup=message.reply_markup,
     )
     await callback_query.answer()
+
+
+@router.callback_query(FieldCallback.filter(), GameGroup.enemy_turn)
+async def wrong_turn_handler(callback_query: CallbackQuery):
+    await callback_query.answer("Not your turn")
