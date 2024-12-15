@@ -7,6 +7,7 @@ src/my_app/bot/__init__.py
 src/my_app/bot/app.py
 src/my_app/bot/bg_tasks.py
 src/my_app/bot/bot.py
+src/my_app/bot/logger.py
 src/my_app/bot/api/tg/__init__.py
 src/my_app/bot/api/tg/router.py
 src/my_app/bot/api/tg/tg.py
@@ -36,6 +37,7 @@ src/my_app/config/settings.py
 src/my_app/game/__init__.py
 src/my_app/game/__main__.py
 src/my_app/game/app.py
+src/my_app/game/logger.py
 src/my_app/game/room_manager.py
 src/my_app/game/test_client.py
 src/my_app/game/handlers/__init__.py
@@ -51,6 +53,7 @@ src/my_app/game/storage/rabbit.py
 src/my_app/game/storage/redis.py
 src/my_app/matchmaker/__main__.py
 src/my_app/matchmaker/app.py
+src/my_app/matchmaker/logger.py
 src/my_app/matchmaker/matchmaker.py
 src/my_app/matchmaker/handlers/__init__.py
 src/my_app/matchmaker/handlers/match.py

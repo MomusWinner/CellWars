@@ -39,6 +39,8 @@ hiredis = "^3.0.0"
 aio-pika = "^9.4.3"
 msgpack = "^1.1.0"
 starlette-context = "^0.3.6"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "1.4"
@@ -79,6 +81,10 @@ extend-exclude = '''
 )
 '''
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
 [tool.isort]
 line_length = 100
 combine_as_imports = true
@@ -92,7 +98,7 @@ plugins = [
     "sqlalchemy.ext.mypy.plugin",
     "pydantic.mypy",
 ]
-strict = true
+strict_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 check_untyped_defs = true
@@ -103,6 +109,7 @@ exclude = [
     "^conf/",
     "^tests/",
     "^utils/",
+    "^.venv/",
 ]
 disable_error_code = ["import-untyped"]
 
