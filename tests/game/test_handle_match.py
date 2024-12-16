@@ -19,4 +19,3 @@ from my_app.matchmaker.app import main
 @pytest.mark.usefixtures("_load_queue")
 async def test_first(predefined_queue: list[Any]) -> None:
     await main()
-    print("test")
