@@ -4,7 +4,7 @@ import msgpack
 
 from my_app.matchmaker.handlers.match import handle_event_get_match
 from my_app.matchmaker.logger import LOGGING_CONFIG, logger
-from my_app.matchmaker.storage.rabbit import channel_pool
+from my_app.matchmaker.storage import rabbit
 from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE
 from my_app.shared.schema.messages.match import MatchMessage
 
@@ -13,7 +13,10 @@ async def main() -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.info("Starting matchmaker")
     queue_name = MATCHES_QUEUE
-    async with channel_pool.acquire() as channel:
+    print("main ")
+    print(type(rabbit.channel_pool))
+    async with rabbit.channel_pool.acquire() as channel:
+        raise Exception(type(channel))
         await channel.set_qos(prefetch_count=10)
         queue = await channel.declare_queue(queue_name, durable=True)
 

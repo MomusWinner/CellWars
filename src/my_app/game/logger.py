@@ -3,11 +3,7 @@ from contextvars import ContextVar
 
 import yaml
 
-<<<<<<< HEAD
 with open("src/my_app/config/logging.conf.yml", "r") as f:
-=======
-with open('src/my_app/config/logging.conf.yml', 'r') as f:
->>>>>>> dev
     LOGGING_CONFIG = yaml.full_load(f)
 
 

@@ -21,11 +21,7 @@ user_id2 = 222
 room_id = ""
 
 
-<<<<<<< HEAD
 async def send_test_search_data(user_id: str, action: str = "search") -> None:
-=======
-async def send_test_search_data(user_id: int, action: str = "search") -> None:
->>>>>>> dev
     queue_name = MATCHES_QUEUE
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel

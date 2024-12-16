@@ -1,33 +1,19 @@
 from uuid import uuid4
 
 import aio_pika
-<<<<<<< HEAD
-
+import msgpack
 from my_app.game.logger import logger
 from my_app.game.room_manager import create_room, send_command
-from my_app.game.storage.rabbit import channel_pool
+from my_app.game.storage import rabbit
 from my_app.shared.rabbit.matchmaking import USER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
 from my_app.shared.schema.messages.match import CreateMatchMessage, RoomCreatedMessage
 from my_app.shared.schema.redis.redis_keys import ROOM_KEY
-=======
-import msgpack
-
-from my_app.game.logger import logger
-from my_app.game.room_manager import create_room
-from my_app.game.storage.rabbit import channel_pool
-from my_app.shared.rabbit.matchmaking import USER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
-from my_app.shared.schema.messages.match import CreateMatchMessage, RoomCreatedMessage
->>>>>>> dev
 
 
 async def handle_event_create_match(message: CreateMatchMessage) -> None:
     user_ids: list[int] = message["user_ids"]
     room_id = str(uuid4())
-<<<<<<< HEAD
-    logger.info(F"ROOM UUID: {room_id}\ncreate room for user_ids: {user_ids}")
-=======
     logger.info(f"ROOM UUID: {room_id}\ncreate room for user_ids: {user_ids}")
->>>>>>> dev
 
     game, game_world = create_room(room_id=room_id, user_id1=user_ids[0], user_id2=user_ids[1])
 
@@ -38,7 +24,7 @@ async def handle_event_create_match(message: CreateMatchMessage) -> None:
             user_id_turn = user_id
 
     queue_name = USER_MATCH_QUEUE_KEY
-    async with channel_pool.acquire() as channel:
+    async with rabbit.channel_pool.acquire() as channel:
         channel: aio_pika.Channel
         queue = await channel.declare_queue(queue_name, durable=True)
         exchange = await channel.declare_exchange(
