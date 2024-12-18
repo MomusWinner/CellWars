@@ -3,6 +3,7 @@ import msgpack
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from my_app.shared.schema.messages.match import create_match_message
 from my_app.bot.composables.actions import add_field_actions
 from my_app.bot.composables.field import render_field
 from my_app.bot.composables.info import game_info
@@ -24,9 +25,7 @@ from .router import router
 @router.callback_query(MATCHMAKING_INLINE())
 async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) -> None:
     if not isinstance(callback_query.message, Message):
-        raise Exception(
-            "Wrong type for the callback query message:", type(callback_query.message)
-        )
+        raise Exception("Wrong type for the callback query message:", type(callback_query.message))
 
     await state.set_state(GameGroup.matchmaking)
 
@@ -41,14 +40,10 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
     channel: aio_pika.Channel
     async with channel_pool.acquire() as channel:
         queue = await channel.declare_queue(MATCHES_QUEUE, durable=True)
-        exchange = await channel.declare_exchange(
-            MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True
-        )
+        exchange = await channel.declare_exchange(MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
         await queue.bind(exchange)
-        body_exchange: bytes | None = msgpack.packb(
-            MatchMessage.create(user_id=user_id, action="search")
-        )
+        body_exchange: bytes | None = msgpack.packb(create_match_message(user_id=user_id, action="search"))
         if body_exchange is None:
             return
 
@@ -61,9 +56,7 @@ async def start_matchmaking(callback_query: CallbackQuery, state: FSMContext) ->
 @router.callback_query(CANCEL_MATCHMAKING_INLINE())
 async def cancel_matchmaking(callback_query: CallbackQuery, state: FSMContext) -> None:
     if not isinstance(callback_query.message, Message):
-        raise Exception(
-            "Wrong type for the callback query message:", type(callback_query.message)
-        )
+        raise Exception("Wrong type for the callback query message:", type(callback_query.message))
 
     await state.set_state(MenuGroup.start)
     text, markup = start_menu()
@@ -72,14 +65,10 @@ async def cancel_matchmaking(callback_query: CallbackQuery, state: FSMContext) -
     channel: aio_pika.Channel
     async with channel_pool.acquire() as channel:
         queue = await channel.declare_queue(MATCHES_QUEUE, durable=True)
-        exchange = await channel.declare_exchange(
-            MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True
-        )
+        exchange = await channel.declare_exchange(MATCHMAKER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
         await queue.bind(exchange)
-        body_exchange: bytes | None = msgpack.packb(
-            MatchMessage.create(user_id=user_id, action="stop_search")
-        )
+        body_exchange: bytes | None = msgpack.packb(create_match_message(user_id=user_id, action="stop_search"))
         if body_exchange is None:
             return
 
