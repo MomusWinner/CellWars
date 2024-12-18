@@ -13,13 +13,9 @@ async def main() -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.info("Starting matchmaker")
     queue_name = MATCHES_QUEUE
-    print("main ")
-    print(type(rabbit.channel_pool))
     async with rabbit.channel_pool.acquire() as channel:
-        raise Exception(type(channel))
         await channel.set_qos(prefetch_count=10)
         queue = await channel.declare_queue(queue_name, durable=True)
-
         async with queue.iterator() as queue_iter:
             async for message in queue_iter:
                 async with message.process():
