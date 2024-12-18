@@ -21,8 +21,8 @@ from my_app.shared.schema.messages.game import (
 )
 from my_app.shared.schema.messages.match import (
     ROOM_CREATED_MESSAGE_EVENT,
-    MatchMessage,
     RoomCreatedMessage,
+    create_match_message,
 )
 
 user_id1 = 111
@@ -42,7 +42,7 @@ async def send_test_search_data(user_id: str, action: str = "search") -> None:
 
         await exchange.publish(
             aio_pika.Message(
-                msgpack.packb(MatchMessage.create(action, user_id)),
+                msgpack.packb(create_match_message(action, user_id)),
             ),
             routing_key=queue_name,
         )
@@ -77,7 +77,7 @@ async def read_game_response() -> None:
                 message = await queue.get()
                 async with message.process():
                     body: GameInfoMessage = msgpack.unpackb(message.body)
-                    if body['event'] == GAME_MESSAGE_EVENT:
+                    if body["event"] == GAME_MESSAGE_EVENT:
 
                         game_world = body["game_world"]
                         if game_world is not None:
@@ -103,7 +103,7 @@ async def read_match_create_response() -> None:
                 message = await queue.get()
                 async with message.process():
                     body: RoomCreatedMessage = msgpack.unpackb(message.body)
-                    if body['event'] == ROOM_CREATED_MESSAGE_EVENT:
+                    if body["event"] == ROOM_CREATED_MESSAGE_EVENT:
                         print("  user id turn:", body["user_id_turn"])
                         print("  game_world:", body["game_world"] is not None)
                         print("  room_id:", body["room_id"])
