@@ -1,5 +1,5 @@
 from my_app.shared.game.game_logic.command import GameCommand
-from my_app.shared.game.game_logic.game_main import Game
+from my_app.shared.game.game_logic.game_main import Game, GameStates
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import get_game_world_json
 
 rooms: dict[str, Game] = {}
@@ -27,10 +27,10 @@ def create_room(room_id: str, user_id1: int, user_id2: int) -> tuple[Game, str]:
 
 
 def remove_room(room_id: str) -> bool:
-    return (rooms.pop(room_id, None) is not None)
+    return rooms.pop(room_id, None) is not None
 
 
-def send_command(room_id: str, command: GameCommand) -> int:
+def send_command(room_id: str, command: GameCommand) -> GameStates:
     if room_id in rooms:
-        return rooms[room_id].game_step(command)
-    return -1
+        state: GameStates = GameStates(rooms[room_id].game_step(command))
+    return state

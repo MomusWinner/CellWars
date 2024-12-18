@@ -6,7 +6,7 @@ from my_app.matchmaker.handlers.match import handle_event_get_match
 from my_app.matchmaker.logger import LOGGING_CONFIG, logger
 from my_app.matchmaker.storage import rabbit
 from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE
-from my_app.shared.schema.messages.match import MatchMessage
+from my_app.shared.schema.messages.match import MATCH_MESSAGE_EVENT, MatchMessage
 
 
 async def main() -> None:
@@ -20,5 +20,5 @@ async def main() -> None:
             async for message in queue_iter:
                 async with message.process():
                     body: MatchMessage = msgpack.unpackb(message.body)
-                    if body["event"] == MatchMessage.event:
+                    if body["event"] == MATCH_MESSAGE_EVENT:
                         await handle_event_get_match(body)

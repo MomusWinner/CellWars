@@ -6,7 +6,7 @@ import msgpack
 from my_app.matchmaker.logger import logger
 from my_app.matchmaker.storage import rabbit
 from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE, GAME_MATCH_EXCHANGE
-from my_app.shared.schema.messages.match import CreateMatchMessage
+from my_app.shared.schema.messages.match import create_create_match_message
 
 
 class Matchmaker:
@@ -30,7 +30,7 @@ class Matchmaker:
     async def send_create_match_message(self, user_ids: list[int]) -> None:
         async with rabbit.channel_pool.acquire() as channel:
             queue = await channel.declare_queue(CREATE_MATCH_QUEUE, durable=True)
-            exchange = await channel.declare_exchange(
+            exchange = await rabbit.channel.declare_exchange(
                 GAME_MATCH_EXCHANGE,
                 aio_pika.ExchangeType.DIRECT,
                 durable=True
@@ -38,7 +38,7 @@ class Matchmaker:
             await queue.bind(exchange)
             await exchange.publish(
                 aio_pika.Message(
-                    msgpack.packb(CreateMatchMessage.create(user_ids)),
+                    msgpack.packb(create_create_match_message(user_ids)),
                 ),
                 routing_key=CREATE_MATCH_QUEUE,
             )

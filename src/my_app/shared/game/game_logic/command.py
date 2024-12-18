@@ -1,33 +1,38 @@
-from dataclasses import dataclass
 from typing import TypedDict
 
-@dataclass
 class PositionCommand(TypedDict):
     x: int
     y: int
 
 
-@dataclass
-class GameCommand:
+class GameCommand(TypedDict):
     user_id: int
     command_name: str
 
 
-@dataclass
 class MoveWarriorsCommand(GameCommand):
-    command_name = "MOVE_WARRIORS"
     move_from: PositionCommand
     move_to: PositionCommand
 
 
-@dataclass
 class BuyWarriorsCommand(GameCommand):
-    command_name = "BUY_WARRIORS"
     position: PositionCommand
     count: int
 
 
-@dataclass
-class BuildBankCommand(GameCommand):
-    command_name = "BUILD_BANK"
+class BuildBank(GameCommand):
     position: PositionCommand
+
+
+def create_move_warriors_command(
+    user_id: int, move_from: PositionCommand, move_to: PositionCommand
+) -> MoveWarriorsCommand:
+    return MoveWarriorsCommand(command_name="MOVE_WARRIORS", user_id=user_id, move_to=move_to, move_from=move_from)
+
+
+def create_buy_warriors_command(user_id: int, position: PositionCommand, count: int) -> BuyWarriorsCommand:
+    return BuyWarriorsCommand(command_name="BUY_WARRIORS", user_id=user_id, position=position, count=count)
+
+
+def create_build_bank_command(user_id: int, position: PositionCommand) -> BuildBank:
+    return BuildBank(command_name="BUILD_BANK", user_id=user_id, position=position)

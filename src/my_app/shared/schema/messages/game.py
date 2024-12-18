@@ -2,29 +2,41 @@ from my_app.shared.game.game_logic.command import GameCommand
 from my_app.shared.game.game_logic.game_main import GameStates
 from my_app.shared.schema.messages.base import BaseMessage
 
+GAME_MESSAGE_EVENT = "game_message"
+
 
 class GameMessage(BaseMessage):
-    event = "game_message"
     room_id: str
     command: GameCommand
 
-    @classmethod
-    def create(cls, command: GameCommand, room_id: str):
-        return GameMessage(event=cls.event, command=command, room_id=room_id)
+
+GAME_INFO_MESSAGE_EVENT = "game_info_message"
 
 
 class GameInfoMessage(BaseMessage):
-    event = "game_info_message"
     game_state: int
     game_world: str | None  # json # GameStates.RUN
     winner_id: int | None  # GameStates.COMPLETE
     exception_code: int | None  # GameStates.ERROR
     user_id_turn: int  # user tg id
 
-    @classmethod
-    def create(
-        cls, game_state: GameStates,
-        game_world: str | None = None, exception_code: int | None = None,
-        winner_id: int | None = None, user_id_turn: int = -1):
-        return GameMessage(event=cls.event, winner_id=winner_id, game_world=game_world,
-            exception_code=exception_code, game_state=game_state, user_id_turn=user_id_turn)
+
+def create_game_message(room_id: str, command: GameCommand) -> GameMessage:
+    return GameMessage(event=GAME_MESSAGE_EVENT, room_id=room_id, command=command)
+
+
+def create_game_info_message(
+    game_state: GameStates,
+    game_world: str | None = None,
+    exception_code: int | None = None,
+    winner_id: int | None = None,
+    user_id_turn: int = -1,
+) -> GameInfoMessage:
+    return GameInfoMessage(
+        event=GAME_INFO_MESSAGE_EVENT,
+        game_state=game_state.value,
+        game_world=game_world,
+        winner_id=winner_id,
+        exception_code=exception_code,
+        user_id_turn=user_id_turn,
+    )
