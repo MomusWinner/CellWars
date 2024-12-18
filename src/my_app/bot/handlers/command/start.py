@@ -1,10 +1,10 @@
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from .router import router
-from ..states.menu import MenuGroup
 from ..buttons import MATCHMAKING_INLINE, STATS_INLINE
+from ..states.menu import MenuGroup
+from .router import router
 
 
 @router.message(Command('start'))

@@ -13,8 +13,17 @@ from my_app.shared.rabbit.matchmaking import (
     MATCHMAKER_MATCH_EXCHANGE,
     USER_MATCH_QUEUE_KEY,
 )
-from my_app.shared.schema.messages.game import GAME_MESSAGE_EVENT, GameInfoMessage, GameMessage, create_game_message
-from my_app.shared.schema.messages.match import ROOM_CREATED_MESSAGE_EVENT, MatchMessage, RoomCreatedMessage
+from my_app.shared.schema.messages.game import (
+    GAME_MESSAGE_EVENT,
+    GameInfoMessage,
+    GameMessage,
+    create_game_message,
+)
+from my_app.shared.schema.messages.match import (
+    ROOM_CREATED_MESSAGE_EVENT,
+    MatchMessage,
+    RoomCreatedMessage,
+)
 
 user_id1 = 111
 user_id2 = 222

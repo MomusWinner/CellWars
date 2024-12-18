@@ -2,6 +2,7 @@ from uuid import uuid4
 
 import aio_pika
 import msgpack
+
 from my_app.game.logger import logger
 from my_app.game.room_manager import create_room, send_command
 from my_app.game.storage import rabbit

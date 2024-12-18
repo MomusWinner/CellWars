@@ -1,6 +1,5 @@
 from aiogram.types import Message
 
-
 from .router import router
 
 

@@ -1,14 +1,20 @@
 import logging
+
 import aio_pika
 import msgpack
-from my_app.game.storage import rabbit
+
 from my_app.game.logger import logger
 from my_app.game.room_manager import get_game, send_command
+from my_app.game.storage import rabbit
 from my_app.shared.game.game_logic.game_exceptions import GameException
 from my_app.shared.game.game_logic.game_main import GameStates
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import get_game_world_json
 from my_app.shared.rabbit.game import GAME_INFO_EXCHANGE, GAME_INFO_QUEUE
-from my_app.shared.schema.messages.game import GameInfoMessage, GameMessage, create_game_info_message
+from my_app.shared.schema.messages.game import (
+    GameInfoMessage,
+    GameMessage,
+    create_game_info_message,
+)
 
 
 async def handle_game_event(message: GameMessage) -> None:

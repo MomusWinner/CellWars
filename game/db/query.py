@@ -2,14 +2,13 @@
 # versions:
 #   sqlc v1.27.0
 # source: query.sql
-from typing import AsyncIterator, Optional
 import uuid
+from typing import AsyncIterator, Optional
 
 import sqlalchemy
 import sqlalchemy.ext.asyncio
 
 from game.db import models
-
 
 ADD_GAME_PLAYER = """-- name: add_game_player \\:exec
 INSERT INTO player_game (player_id, game_id) VALUES (

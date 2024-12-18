@@ -1,16 +1,19 @@
 import aio_pika
 import msgpack
-
+from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram import F
 
-from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
 from my_app.bot.handlers.buttons import CANCEL_MATCHMAKING_INLINE, MATCHMAKING_INLINE, STATS_INLINE
 from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.handlers.states.menu import MenuGroup
 from my_app.bot.storage.rabbit import channel_pool
-from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE, MATCHMAKER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
+from my_app.shared.rabbit.matchmaking import (
+    MATCHES_QUEUE,
+    MATCHMAKER_MATCH_EXCHANGE,
+    USER_MATCH_QUEUE_KEY,
+)
+from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
 
 from .router import router
 
