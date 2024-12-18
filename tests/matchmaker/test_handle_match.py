@@ -1,8 +1,10 @@
 import asyncio
 from typing import Any
+
 import pytest
-from my_app.shared.schema.messages.match import MatchMessage
+
 from my_app.matchmaker.app import main
+from my_app.shared.schema.messages.match import MatchMessage
 from tests.mocking.rabbitmq import MockExchange
 
 
