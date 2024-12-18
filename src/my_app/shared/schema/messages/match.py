@@ -1,32 +1,49 @@
 from .base import BaseMessage
 
+MATCH_MESSAGE_EVENT = "match_message"
+
 
 class MatchMessage(BaseMessage):
-    event = "match_message"
-    action: str # search or stop_search
+    action: str  # search or stop_search
     user_id: int
 
-    @classmethod
-    def create(cls, action, user_id):
-        return MatchMessage(event=cls.event, action=action, user_id=user_id)
+
+def create_match_message(action: str, user_id: int):
+    return MatchMessage(event=MATCH_MESSAGE_EVENT, action=action, user_id=user_id)
 
 
-class CreateMatchMessage(BaseMessage): # send to game server
-    event = "create_match"
-    user_ids : list[int]
+CREATE_MATCH_MESSAGE_EVENT = "create_match"
 
-    @classmethod
-    def create(cls, user_ids: list[int]):
-        return CreateMatchMessage(event=cls.event, user_ids=user_ids)
+
+class CreateMatchMessage(BaseMessage):
+    user_ids: list[int]
+
+
+def create_create_match_message(user_ids: list[int]):
+    return CreateMatchMessage(event=CREATE_MATCH_MESSAGE_EVENT, user_ids=user_ids)
+
+
+ROOM_ID_MESSAGE_EVENT = "room_id"
+
+
+class RoomIdMessage(BaseMessage):
+    room_id: str
+
+
+def create_room_id_message(room_id: str) -> RoomIdMessage:
+    return RoomIdMessage(event=ROOM_ID_MESSAGE_EVENT, room_id=room_id)
+
+
+ROOM_CREATED_MESSAGE_EVENT = "room_id"
 
 
 class RoomCreatedMessage(BaseMessage):
-    event = "room_id"
     room_id: str
-    user_id_turn: int  # user tg id
+    user_id_turn: int
     game_world: str
 
-    @classmethod
-    def create(cls, room_id: str, game_world: str, user_id_turn: int):
-        return RoomCreatedMessage(event=cls.event, room_id=room_id,
-                game_world=game_world, user_id_turn=user_id_turn)
+
+def create_room_created_message(room_id: str, game_world: str, user_id_turn: int) -> RoomCreatedMessage:
+    return RoomCreatedMessage(
+        event=ROOM_CREATED_MESSAGE_EVENT, room_id=room_id, game_world=game_world, user_id_turn=user_id_turn
+    )

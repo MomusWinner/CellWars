@@ -13,8 +13,8 @@ from my_app.shared.rabbit.matchmaking import (
     MATCHMAKER_MATCH_EXCHANGE,
     USER_MATCH_QUEUE_KEY,
 )
-from my_app.shared.schema.messages.game import GameInfoMessage, GameMessage
-from my_app.shared.schema.messages.match import MatchMessage, RoomCreatedMessage
+from my_app.shared.schema.messages.game import GAME_MESSAGE_EVENT, GameInfoMessage, GameMessage, create_game_message
+from my_app.shared.schema.messages.match import ROOM_CREATED_MESSAGE_EVENT, MatchMessage, RoomCreatedMessage
 
 user_id1 = 111
 user_id2 = 222
@@ -41,21 +41,17 @@ async def send_test_search_data(user_id: int, action: str = "search") -> None:
 
 async def send_game_message(command: GameCommand, room_id: str) -> None:
     async with channel_pool.acquire() as channel:
-            channel: aio_pika.Channel
-            queue = await channel.declare_queue(GAME_QUEUE, durable=True)
-            exchange = await channel.declare_exchange(
-                GAME_EXCHANGE,
-                aio_pika.ExchangeType.DIRECT,
-                durable=True
-            )
+        channel: aio_pika.Channel
+        queue = await channel.declare_queue(GAME_QUEUE, durable=True)
+        exchange = await channel.declare_exchange(GAME_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
 
-            await queue.bind(exchange)
-            await exchange.publish(
-                aio_pika.Message(
-                    msgpack.packb(GameMessage.create(command=command, room_id=room_id)),
-                ),
-                routing_key=GAME_QUEUE,
-            )
+        await queue.bind(exchange)
+        await exchange.publish(
+            aio_pika.Message(
+                msgpack.packb(create_game_message(command=command, room_id=room_id)),
+            ),
+            routing_key=GAME_QUEUE,
+        )
 
 
 async def read_game_response() -> None:
@@ -72,11 +68,8 @@ async def read_game_response() -> None:
                 message = await queue.get()
                 async with message.process():
                     body: GameInfoMessage = msgpack.unpackb(message.body)
-                    if body['event'] == GameInfoMessage.event:
-                        print(f"  game_state: {body["game_state"]}")
-                        print(f"  winner_id: {body["winner_id"]}")
-                        print(f"  your_turn: ", body["user_id_turn"])
-                        print(f"  exception_code: {body["exception_code"]}")
+                    if body['event'] == GAME_MESSAGE_EVENT:
+
                         game_world = body["game_world"]
                         if game_world is not None:
                             game_world = json_to_game_world(body["game_world"])
@@ -101,7 +94,7 @@ async def read_match_create_response() -> None:
                 message = await queue.get()
                 async with message.process():
                     body: RoomCreatedMessage = msgpack.unpackb(message.body)
-                    if body['event'] == RoomCreatedMessage.event:
+                    if body['event'] == ROOM_CREATED_MESSAGE_EVENT:
                         print("  user id turn:", body["user_id_turn"])
                         print("  game_world:", body["game_world"] is not None)
                         print("  room_id:", body["room_id"])
@@ -117,28 +110,39 @@ async def run() -> None:
     room_id = input("room_id: ")
     await read_match_create_response()
 
-    command2 = {"command_name": "BUY_WARRIORS", "position":  {"x":1, "y":1}, "user_id":user_id2, "count": 1000}
+    command2 = {"command_name": "BUY_WARRIORS", "position": {"x": 1, "y": 1}, "user_id": user_id2, "count": 1000}
     await send_game_message(command2, room_id)
     await read_game_response()
 
     await asyncio.sleep(1)
-    command = {"command_name": "BUY_WARRIORS", "position": {"x":1, "y":3}, "user_id":user_id1, "count": 10}
+    command = {"command_name": "BUY_WARRIORS", "position": {"x": 1, "y": 3}, "user_id": user_id1, "count": 10}
     await send_game_message(command, room_id)
     await read_game_response()
 
     await asyncio.sleep(1)
-    command2 = {"command_name": "MOVE_WARRIORS", "move_from":  {"x":1, "y":1}, "move_to":{"x":1, "y":3},"user_id":user_id2}
+    command2 = {
+        "command_name": "MOVE_WARRIORS",
+        "move_from": {"x": 1, "y": 1},
+        "move_to": {"x": 1, "y": 3},
+        "user_id": user_id2,
+    }
     await send_game_message(command2, room_id)
     await read_game_response()
 
     await asyncio.sleep(1)
-    command = {"command_name": "BUY_WARRIORS", "position": {"x":3, "y":3}, "user_id":user_id1, "count": 10}
+    command = {"command_name": "BUY_WARRIORS", "position": {"x": 3, "y": 3}, "user_id": user_id1, "count": 10}
     await send_game_message(command, room_id)
     await read_game_response()
 
     await asyncio.sleep(1)
-    command2 = {"command_name": "MOVE_WARRIORS", "move_from":  {"x":1, "y":3}, "move_to":{"x":2, "y":4},"user_id":user_id2}
+    command2 = {
+        "command_name": "MOVE_WARRIORS",
+        "move_from": {"x": 1, "y": 3},
+        "move_to": {"x": 2, "y": 4},
+        "user_id": user_id2,
+    }
     await send_game_message(command2, room_id)
     await read_game_response()
+
 
 asyncio.run(run())
