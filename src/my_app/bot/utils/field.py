@@ -44,7 +44,7 @@ def rotate_field(field: list[list[Cell]], user_tag: int) -> list[list[Cell]]:
 
 
 def map_available_placements(
-    buttons: list[list[InlineKeyboardButton]], places: list[str]
+    buttons: list[list[InlineKeyboardButton]], type: str, places: list[str]
 ) -> list[list[InlineKeyboardButton]]:
     for y in range(len(buttons)):
         if y < 3:
@@ -66,7 +66,7 @@ def map_available_placements(
                 callback_data=PlacementCallback(
                     cell_x=field_callback.cell_x,
                     cell_y=field_callback.cell_y,
-                    type=field_callback.type,
+                    type=type,
                 ).pack(),
             )
     return buttons
