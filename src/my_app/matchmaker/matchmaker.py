@@ -30,7 +30,7 @@ class Matchmaker:
     async def send_create_match_message(self, user_ids: list[int]) -> None:
         async with rabbit.channel_pool.acquire() as channel:
             queue = await channel.declare_queue(CREATE_MATCH_QUEUE, durable=True)
-            exchange = await rabbit.channel.declare_exchange(
+            exchange = await channel.declare_exchange(
                 GAME_MATCH_EXCHANGE,
                 aio_pika.ExchangeType.DIRECT,
                 durable=True
