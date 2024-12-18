@@ -7,7 +7,7 @@ from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE
 from my_app.shared.schema.messages.match import CREATE_MATCH_MESSAGE_EVENT, CreateMatchMessage
 
 
-async def handle_matches():
+async def handle_matches() -> None:
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
 
@@ -18,5 +18,5 @@ async def handle_matches():
             async for message in queue_iter:
                 async with message.process():
                     body: CreateMatchMessage = msgpack.unpackb(message.body)
-                    if body['event'] == CREATE_MATCH_MESSAGE_EVENT:
+                    if body["event"] == CREATE_MATCH_MESSAGE_EVENT:
                         await handle_event_create_match(body)

@@ -2,8 +2,8 @@
 # versions:
 #   sqlc v1.27.0
 import dataclasses
-from typing import Optional
 import uuid
+from typing import Optional
 
 
 @dataclasses.dataclass()

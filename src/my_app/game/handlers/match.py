@@ -4,10 +4,10 @@ import aio_pika
 import msgpack
 
 from my_app.game.logger import logger
-from my_app.game.room_manager import create_room
-from my_app.game.storage.rabbit import channel_pool
+from my_app.game.room_manager import create_room, send_command
+from my_app.game.storage import rabbit
 from my_app.shared.rabbit.matchmaking import USER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
-from my_app.shared.schema.messages.match import CreateMatchMessage, RoomCreatedMessage, create_room_created_message
+from my_app.shared.schema.messages.match import CreateMatchMessage, create_room_created_message
 
 
 async def handle_event_create_match(message: CreateMatchMessage) -> None:
@@ -24,7 +24,7 @@ async def handle_event_create_match(message: CreateMatchMessage) -> None:
             user_id_turn = user_id
 
     queue_name = USER_MATCH_QUEUE_KEY
-    async with channel_pool.acquire() as channel:
+    async with rabbit.channel_pool.acquire() as channel:
         channel: aio_pika.Channel
         queue = await channel.declare_queue(queue_name, durable=True)
         exchange = await channel.declare_exchange(USER_MATCH_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)

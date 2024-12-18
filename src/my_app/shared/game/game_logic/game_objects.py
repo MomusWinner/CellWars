@@ -1,7 +1,9 @@
 from __future__ import annotations
-from my_app.shared.game.game_logic.core import GameObject, Position, GameWorld, Cell, Player
-from my_app.shared.game.game_logic.game_exceptions import IncorrectMovementPositionException
+
 from abc import ABC, abstractmethod
+
+from my_app.shared.game.game_logic.core import Cell, GameObject, GameWorld, Player, Position
+from my_app.shared.game.game_logic.game_exceptions import IncorrectMovementPositionException
 
 
 class Iterable(ABC):

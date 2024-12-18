@@ -157,7 +157,7 @@ class Game:
                 move_to = core.Position(**mw_command["move_to"])
                 self.move_warriors(move_from, move_to, user_tag)
             case "BUILD_BANK":
-                build_bank_command: command.BuildBank = income_command
+                build_bank_command: command.BuildBankCommand = income_command
                 position = core.Position(**build_bank_command["position"])
                 self.build_bank(position, user_tag)
             case "BUY_WARRIORS":

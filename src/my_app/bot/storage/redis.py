@@ -1,4 +1,4 @@
-from redis.asyncio import Redis, ConnectionPool
+from redis.asyncio import ConnectionPool, Redis
 
 from my_app.config.settings import settings
 

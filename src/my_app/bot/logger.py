@@ -6,7 +6,7 @@ from starlette_context import context
 from starlette_context.errors import ContextDoesNotExistError
 from starlette_context.header_keys import HeaderKeys
 
-with open('src/my_app/config/logging.conf.yml', 'r') as f:
+with open("src/my_app/config/logging.conf.yml", "r") as f:
     LOGGING_CONFIG = yaml.full_load(f)
 
 
@@ -14,9 +14,9 @@ class ConsoleFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         with suppress(ContextDoesNotExistError):
             if corr_id := context.get(HeaderKeys.correlation_id, None):
-                return '[%s] %s' % (corr_id, super().format(record))
+                return "[%s] %s" % (corr_id, super().format(record))
 
         return super().format(record)
 
 
-logger = logging.getLogger('bot_logger')
+logger = logging.getLogger("bot_logger")

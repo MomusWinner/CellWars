@@ -1,21 +1,22 @@
 import asyncio
-import uvicorn
+import logging.config
 
-from aiogram import Dispatcher, Bot
+import uvicorn
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from fastapi import FastAPI
 
-from my_app.bot.bot import setup_bot, setup_dp
-from my_app.bot.bg_tasks import background_tasks
 from my_app.bot.api.tg.router import router as tg_router
-from my_app.config.settings import settings
 from my_app.bot.api.v1.router import router as v1_router
-from my_app.bot.storage.redis import setup_redis
+from my_app.bot.bg_tasks import background_tasks
+from my_app.bot.bot import setup_bot, setup_dp
 from my_app.bot.handlers.callback.router import router as callback_router
 from my_app.bot.handlers.command.router import router as command_router
 from my_app.bot.handlers.message.router import router as message_router
-from my_app.bot.logger import logger, LOGGING_CONFIG
-import logging.config
+from my_app.bot.logger import LOGGING_CONFIG, logger
+from my_app.bot.storage.redis import setup_redis
+from my_app.config.settings import settings
+
 
 async def lifespan(app: FastAPI) -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
