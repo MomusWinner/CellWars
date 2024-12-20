@@ -14,6 +14,7 @@ from my_app.bot.bot import setup_bot, setup_dp
 from my_app.bot.handlers.callback.router import router as callback_router
 from my_app.bot.handlers.command.router import router as command_router
 from my_app.bot.handlers.message.router import router as message_router
+from my_app.bot.listeners.game import listen_turns
 from my_app.bot.listeners.matchmaking import listen_matches
 from my_app.bot.logger import LOGGING_CONFIG, logger
 from my_app.bot.storage.redis import setup_redis
@@ -46,7 +47,7 @@ def create_app() -> FastAPI:
     return app
 
 
-async def start_polling():
+async def start_polling() -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.info("Starting bot")
 
@@ -68,7 +69,9 @@ async def start_polling():
     await bot.delete_webhook()
 
     logging.info("Dependencies launched")
-    await asyncio.gather(listen_matches(bot, storage), dp.start_polling(bot))
+    await asyncio.gather(
+        listen_matches(bot, storage), listen_turns(bot, storage), dp.start_polling(bot, handle_signals=False)
+    )
 
 
 if __name__ == "__main__":
