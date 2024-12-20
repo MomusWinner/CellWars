@@ -37,10 +37,24 @@ def rotate_counterclockwise(matrix: list[list[T]]) -> list[list[T]]:
     return list(zip(*matrix))[::-1]
 
 
+def rotate_coordinates_clockwise(point: tuple[int, int], len_x: int) -> tuple[int, int]:
+    return point[1], len_x - point[0] - 1
+
+
+def rotate_coordinates_counterclockwise(point: tuple[int, int], len_y: int) -> tuple[int, int]:
+    return len_y - point[1] - 1, point[0]
+
+
 def rotate_field(field: list[list[Cell]], user_tag: int) -> list[list[Cell]]:
     if user_tag == 2:
         return rotate_clockwise(field)
     return rotate_counterclockwise(field)
+
+
+def rotate_coordinates(point: tuple[int, int], len_x: int, len_y: int, user_tag: int) -> tuple[int, int]:
+    if user_tag == 2:
+        return rotate_coordinates_counterclockwise(point, len_y)
+    return rotate_coordinates_clockwise(point, len_x)
 
 
 def map_available_placements(
