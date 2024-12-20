@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 
 from my_app.matchmaker.app import main
-from my_app.shared.schema.messages.match import MatchMessage
+from my_app.shared.schema.messages.match import MatchMessage, create_match_message
 from tests.mocking.rabbitmq import MockExchange
 
 
@@ -13,8 +13,8 @@ from tests.mocking.rabbitmq import MockExchange
     [
         (
             [
-                MatchMessage.create("search", 111),
-                MatchMessage.create("search", 222)
+                create_match_message("search", 111),
+                create_match_message("search", 222)
             ],
         ),
     ]
