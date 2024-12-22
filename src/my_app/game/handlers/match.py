@@ -13,7 +13,7 @@ from my_app.shared.schema.messages.match import CreateMatchMessage, create_room_
 async def handle_event_create_match(message: CreateMatchMessage) -> None:
     user_ids: list[int] = message["user_ids"]
     room_id = str(uuid4())
-    logger.info(f"ROOM UUID: {room_id}\ncreate room for user_ids: {user_ids}")
+    logger.info("ROOM UUID: %s\ncreate room for user_ids: %s", room_id, str(user_ids))
 
     game, game_world = create_room(room_id=room_id, user_id1=user_ids[0], user_id2=user_ids[1])
 
