@@ -12,28 +12,55 @@ services:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
-
-  # game_app:
-  #   build: .
-  #   command: scripts/startup.sh
-  #   volumes:
-  #     - "./:/code"
-  #   ports:
-  #     - "8000:8000"
-  #   env_file:
-  #     - config/.env
+    networks:
+      - sirius
 
   rabbitmq:
     image: rabbitmq:3.13.7-management
     ports:
       - 5672:5672
       - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 15s
+      timeout: 10s
+      retries: 4
+    networks:
+      - sirius
 
   redis:
     image: redis/redis-stack:latest
     ports:
       - "6379:6379"
+    networks:
+      - sirius
+
+  matchmaker:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: python -m src.my_app.matchmaker
+    restart: always
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - sirius
+
+  game:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: python -m src.my_app.game
+    restart: always
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - sirius
+
+  # bot:
 
 networks:
- sirius:
-   external: true
+  sirius:
+    driver: bridge

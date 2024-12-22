@@ -11,10 +11,10 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
 
-    RABBIT_HOST: str = 'localhost' # rabbitmq
-    RABBIT_PORT: int = 5672
-    RABBIT_USER: str = 'guest'
-    RABBIT_PASSWORD: str = 'guest'
+    RABBIT_HOST: str
+    RABBIT_PORT: int
+    RABBIT_USER: str
+    RABBIT_PASSWORD: str
 
     REDIS_HOST: str
     REDIS_PORT: str

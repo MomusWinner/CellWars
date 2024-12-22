@@ -14,6 +14,7 @@ from my_app.shared.rabbit.matchmaking import (
     USER_MATCH_QUEUE_KEY,
 )
 from my_app.shared.schema.messages.game import (
+    GAME_INFO_MESSAGE_EVENT,
     GAME_MESSAGE_EVENT,
     GameInfoMessage,
     GameMessage,
@@ -77,7 +78,7 @@ async def read_game_response() -> None:
                 message = await queue.get()
                 async with message.process():
                     body: GameInfoMessage = msgpack.unpackb(message.body)
-                    if body["event"] == GAME_MESSAGE_EVENT:
+                    if body["event"] == GAME_INFO_MESSAGE_EVENT:
 
                         game_world = body["game_world"]
                         if game_world is not None:
