@@ -28,7 +28,7 @@ def json_to_game_world(json_string: str) -> core.GameWorld:
             case "Position":
                 return core.Position(g_dict["x"], g_dict["y"])
             case "Player":
-                return core.Player(g_dict["team_tag"], g_dict["user_id"])
+                return core.Player(g_dict["team_tag"], g_dict["user_id"], g_dict["stats"])
             case "Cell":
                 return core.Cell(g_dict["position"], g_dict["game_object"])
             case "GameWorld":
