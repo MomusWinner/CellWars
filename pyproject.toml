@@ -112,7 +112,7 @@ exclude = [
     "^utils/",
     "^.venv/",
 ]
-disable_error_code = ["import-untyped"]
+disable_error_code = ["import-untyped", "no-redef"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
