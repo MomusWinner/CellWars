@@ -14,7 +14,7 @@ from typing_extensions import AsyncGenerator
 
 class CConnection(Connection):
     def _get_unique_id(self, prefix: str) -> str:
-        return f'__asyncpg_{prefix}_{uuid4()}__'
+        return f"__asyncpg_{prefix}_{uuid4()}__"
 
 
 def create_engine() -> AsyncEngine:
@@ -22,11 +22,8 @@ def create_engine() -> AsyncEngine:
         settings.db_url,
         poolclass=AsyncAdaptedQueuePool,
         connect_args={
-            'connection_class': CConnection,
+            "connection_class": CConnection,
         },
-        # 'pool_recycle': 3600,
-        # 'pool_size': 10,
-        # 'max_overflow': 30,
     )
 
 

@@ -12,7 +12,7 @@ def setup_redis() -> Redis:
     redis_ = Redis(connection_pool=pool)
 
     redis = redis_
-    return redis
+    return redis_
 
 
 def get_redis() -> Redis:

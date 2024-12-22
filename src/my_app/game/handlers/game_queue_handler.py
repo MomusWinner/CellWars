@@ -7,7 +7,7 @@ from my_app.shared.rabbit.game import GAME_QUEUE
 from my_app.shared.schema.messages.game import GAME_MESSAGE_EVENT, GameMessage
 
 
-async def handle_games():
+async def handle_games() -> None:
     async with channel_pool.acquire() as channel:
         channel: aio_pika.Channel
 
@@ -18,5 +18,5 @@ async def handle_games():
             async for message in queue_iter:
                 async with message.process():
                     body: GameMessage = msgpack.unpackb(message.body)
-                    if body['event'] == GAME_MESSAGE_EVENT:
+                    if body["event"] == GAME_MESSAGE_EVENT:
                         await handle_game_event(body)

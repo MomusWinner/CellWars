@@ -15,9 +15,7 @@ from my_app.shared.rabbit.matchmaking import (
 )
 from my_app.shared.schema.messages.game import (
     GAME_INFO_MESSAGE_EVENT,
-    GAME_MESSAGE_EVENT,
     GameInfoMessage,
-    GameMessage,
     create_game_message,
 )
 from my_app.shared.schema.messages.match import (

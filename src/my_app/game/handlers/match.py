@@ -4,7 +4,7 @@ import aio_pika
 import msgpack
 
 from my_app.game.logger import logger
-from my_app.game.room_manager import create_room, send_command
+from my_app.game.room_manager import create_room
 from my_app.game.storage import rabbit
 from my_app.shared.rabbit.matchmaking import USER_MATCH_EXCHANGE, USER_MATCH_QUEUE_KEY
 from my_app.shared.schema.messages.match import CreateMatchMessage, create_room_created_message
