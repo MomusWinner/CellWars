@@ -55,7 +55,7 @@ class Bank(Building, Iterable):
 
 
 class Warriors(GameObject):  # type: ignore[misc]
-    max_distance = 2
+    max_distance = 1
 
     def __init__(self, cell: Cell, game_world: GameWorld, player: Player, count: int):
         super().__init__(cell, game_world, player)
