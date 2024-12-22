@@ -12,6 +12,7 @@ def test_serialization() -> None:
     json = get_game_world_json(game_world)
     assert json is not None
 
+
 def test_deserialization() -> None:
     game_world = GameWorld(5, 5, {1: Player(1, 111, Stats(90)), 2: Player(2, 222, Stats(90))})
     json = get_game_world_json(game_world)
