@@ -1,6 +1,6 @@
 [flake8]
 inline-quotes = double
-max-line-length=99
+max-line-length=120
 max-local-variables=8
 max-complexity=8
 max-module-members=10
