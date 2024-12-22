@@ -66,16 +66,18 @@ class Game:
     height = 5
     warriors_max_move_distance = 2
 
-    def __init__(self, user_id1: int, user_id2: int) -> None:
+    def __init__(self, user_id1: int, user_id2: int, baseStats: core.Stats | None = None) -> None:
         self.game_state = GameStates.INIT.value
         self.user_id_to_team_tag: dict[int, int] = {
             user_id1: 1,
             user_id2: 2
         }
+
         self.team_tag_to_player = {
-            1: core.Player(1, user_id1),
-            2: core.Player(2, user_id2)
+            1: core.Player(1, user_id1, baseStats.copy() if baseStats is not None else None),
+            2: core.Player(2, user_id2, baseStats.copy() if baseStats is not None else None)
         }
+
         self.game_world: core.GameWorld = core.GameWorld(
             self.width, self.height, self.team_tag_to_player)
         self.go_factory = GameObjectFabric(self.game_world, self.team_tag_to_player)

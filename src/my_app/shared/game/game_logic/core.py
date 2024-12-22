@@ -16,15 +16,18 @@ class Cell:
 
 
 class Stats:
-    def __init__(self) -> None:
-        self.coins = 20000
+    def __init__(self, coins: int = 20000) -> None:
+        self.coins = coins
+
+    def copy(self) -> Stats:
+        return Stats(self.coins)
 
 
 class Player:
-    def __init__(self, team_tag: int, user_id: int):
+    def __init__(self, team_tag: int, user_id: int, stats: Stats | None = None):
         self.user_id = user_id
         self.team_tag = team_tag
-        self.stats = Stats()
+        self.stats = Stats() if stats is None else stats
 
 
 class GameObject(ABC):
