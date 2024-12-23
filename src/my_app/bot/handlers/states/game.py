@@ -5,3 +5,7 @@ class GameGroup(StatesGroup):
     matchmaking = State()
     enemy_turn = State()
     player_turn = State()
+
+
+class PlacementGroup(StatesGroup):
+    warriors = State()
