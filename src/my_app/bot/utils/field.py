@@ -1,6 +1,6 @@
-from typing import TypeVar
+from typing import Any, TypeVar
 
-from aiogram.types import InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, game
 from my_app.bot.types.callbacks import FieldCallback, PlacementCallback
 from my_app.config.settings import settings
 from my_app.shared.game.game_logic.core import Cell, GameObject
@@ -51,7 +51,9 @@ def rotate_field(field: list[list[Cell]], user_tag: int) -> list[list[Cell]]:
     return rotate_counterclockwise(field)
 
 
-def rotate_coordinates(point: tuple[int, int], len_x: int, len_y: int, user_tag: int) -> tuple[int, int]:
+def rotate_coordinates(point: tuple[int, int], game_field: list[list[Any]], user_tag: int) -> tuple[int, int]:
+    len_x = len(game_field)
+    len_y = len(game_field[0])
     if user_tag == 2:
         return rotate_coordinates_counterclockwise(point, len_y)
     return rotate_coordinates_clockwise(point, len_x)
