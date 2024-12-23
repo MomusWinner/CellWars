@@ -16,9 +16,7 @@ class BaseButtonInfo:
         )
 
     def export(self) -> InlineKeyboardButton:
-        return InlineKeyboardButton(
-            text=self.text, callback_data=self.callback_data.pack()
-        )
+        return InlineKeyboardButton(text=self.text, callback_data=self.callback_data.pack())
 
 
 class MenuButtonInfo(BaseButtonInfo):
