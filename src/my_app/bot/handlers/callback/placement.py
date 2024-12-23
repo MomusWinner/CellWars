@@ -1,8 +1,7 @@
-import aio_pika
-import msgpack
+from re import Match
 from aiogram import F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 from my_app.bot.composables.actions import add_cancel_button, add_field_actions
 from my_app.bot.composables.field import (
     render_available_bank_placements,
@@ -14,36 +13,31 @@ from my_app.bot.handlers.buttons import (
     PLACE_BANK_INLINE,
     PLACE_WARRIORS_INLINE,
 )
-from my_app.bot.storage.rabbit import channel_pool
+from my_app.bot.handlers.states.game import PlacementGroup
 from my_app.bot.types.callbacks import PlacementCallback
 from my_app.bot.types.game import GameTGMessage
 from my_app.bot.utils.field import rotate_coordinates
+from my_app.bot.utils.rabbit import publish_message
 from my_app.shared.game.game_logic.command import (
-    BuildBank,
-    BuyWarriorsCommand,
     PositionCommand,
     create_build_bank_command,
+    create_buy_warriors_command,
 )
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
     json_to_game_world,
 )
 from my_app.shared.rabbit.game import GAME_EXCHANGE, GAME_QUEUE
-from my_app.shared.schema.messages.game import GameMessage, create_game_message
+from my_app.shared.schema.messages.game import create_game_message
 
 from .router import router
 
 
-@router.callback_query(PLACE_WARRIORS_INLINE())
+@router.callback_query(PLACE_WARRIORS_INLINE(), F.message.as_("message"), F.reply_markup.as_("reply_markup"))
 async def warrior_placement_intent_handler(
-    callback_query: CallbackQuery,
+    message: Message,
+    reply_markup: InlineKeyboardMarkup,
 ) -> None:
-    if not isinstance(callback_query.message, Message):
-        await callback_query.answer("what")
-        return
-
-    message = callback_query.message
-    reply_markup = message.reply_markup
-    if reply_markup is None or message.text is None:
+    if message.text is None:
         return
 
     game_message = GameTGMessage.from_markup(message.text, reply_markup)
@@ -55,17 +49,12 @@ async def warrior_placement_intent_handler(
     await message.edit_reply_markup(reply_markup=with_cancel.export_markup())
 
 
-@router.callback_query(PLACE_BANK_INLINE())
+@router.callback_query(PLACE_BANK_INLINE(), F.message.as_("message"), F.reply_markup.as_("reply_markup"))
 async def bank_placement_intent_handler(
-    callback_query: CallbackQuery,
+    message: Message,
+    reply_markup: InlineKeyboardMarkup,
 ) -> None:
-    if not isinstance(callback_query.message, Message):
-        await callback_query.answer("what")
-        return
-
-    message = callback_query.message
-    reply_markup = message.reply_markup
-    if reply_markup is None or message.text is None:
+    if message.text is None:
         return
 
     game_message = GameTGMessage.from_markup(message.text, reply_markup)
@@ -77,15 +66,12 @@ async def bank_placement_intent_handler(
     await message.edit_reply_markup(reply_markup=with_cancel.export_markup())
 
 
-@router.callback_query(CANCEL_FIELD_INLINE())
-async def cancel_placement_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
-    if not isinstance(callback_query.message, Message):
-        await callback_query.answer("what")
-        return
-
-    message = callback_query.message
-    reply_markup = message.reply_markup
-    if reply_markup is None or message.text is None:
+@router.callback_query(CANCEL_FIELD_INLINE(), F.message.as_("message"))
+async def cancel_placement_handler(
+    message: Message,
+    state: FSMContext,
+) -> None:
+    if message.text is None:
         return
 
     data = await state.get_data()
@@ -100,50 +86,71 @@ async def cancel_placement_handler(callback_query: CallbackQuery, state: FSMCont
     await message.edit_reply_markup(reply_markup=with_actions.export_markup())
 
 
-@router.callback_query(PlacementCallback.filter(F.type == "bank"))
-async def place_bank_handler(
-    callback_query: CallbackQuery, callback_data: PlacementCallback, state: FSMContext
-) -> None:
-    if not isinstance(callback_query.message, Message):
-        await callback_query.answer("what")
-        return
+@router.callback_query(PlacementCallback.filter(F.type == "warrior"), F.message.as_("message"))
+async def place_warriors_handler(callback_data: PlacementCallback, message: Message, state: FSMContext) -> None:
+    await message.edit_text("Введите колличество:", reply_markup=None)
+    await state.set_state(PlacementGroup.warriors)
+    await state.update_data(warrior_place=(callback_data.cell_y, callback_data.cell_x))
 
+
+@router.callback_query(
+    PlacementCallback.filter(F.type == "bank"), F.message.as_("message"), F.reply_markup.as_("reply_markup")
+)
+async def place_bank_handler(
+    callback_query: CallbackQuery,
+    callback_data: PlacementCallback,
+    message: Message,
+    reply_markup: InlineKeyboardMarkup,
+    state: FSMContext,
+) -> None:
     data = await state.get_data()
     room_id: str = data["room_id"]
     user_tag: int = data["user_tag"]
 
-    message = callback_query.message
-    reply_markup = message.reply_markup
-    if reply_markup is None or message.text is None:
+    if message.text is None:
         return
+
     game_tg_message = GameTGMessage.from_markup(message.text, reply_markup)
-    len_y = len(game_tg_message.field)
-    len_x = len(game_tg_message.field[0])
+
     point = (callback_data.cell_y, callback_data.cell_x)
-    point_rotated = rotate_coordinates(point, len_x, len_y, user_tag)
+    point_rotated = rotate_coordinates(point, game_tg_message.field, user_tag)
     position: PositionCommand = {"x": point_rotated[0], "y": point_rotated[1]}
-    print(user_tag)
-    print(position)
 
-    channel: aio_pika.Channel
-    async with channel_pool.acquire() as channel:
-        queue = await channel.declare_queue(GAME_QUEUE, durable=True)
-        exchange = await channel.declare_exchange(GAME_EXCHANGE, aio_pika.ExchangeType.DIRECT, durable=True)
-
-        await queue.bind(exchange)
-        game_message_dict = create_game_message(
+    await publish_message(
+        create_game_message(
             room_id=room_id,
             command=create_build_bank_command(user_id=callback_query.from_user.id, position=position),
-        )
+        ),
+        GAME_QUEUE,
+        GAME_EXCHANGE,
+    )
 
-        body_exchange: bytes | None = msgpack.packb(game_message_dict)
-        if body_exchange is None:
-            return
-
-        await exchange.publish(
-            aio_pika.Message(
-                body_exchange,
-            ),
-            routing_key=GAME_QUEUE,
-        )
     await callback_query.answer()
+
+
+@router.message(PlacementGroup.warriors, F.text.regexp(r"^(\d+)$").as_("count"), F.from_user.id.as_("user_id"))
+async def warrior_count_handler(message: Message, state: FSMContext, count: Match[str], user_id: int) -> None:
+    data = await state.get_data()
+    room_id: str = data["room_id"]
+    user_tag: int = data["user_tag"]
+    warrior_place: tuple[int, int] = data["warrior_place"]  # (y, x)
+    game_world_json: str = data["game_world"]
+    game_world = json_to_game_world(game_world_json)
+
+    point_rotated = rotate_coordinates(warrior_place, game_world.cells, user_tag)
+    position: PositionCommand = {"x": point_rotated[0], "y": point_rotated[1]}
+
+    await publish_message(
+        create_game_message(
+            room_id=room_id,
+            command=create_buy_warriors_command(
+                user_id=user_id,
+                count=int(count.string),
+                position=position,
+            ),
+        ),
+        GAME_QUEUE,
+        GAME_EXCHANGE,
+    )
+
+    await message.delete()
