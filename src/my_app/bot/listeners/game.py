@@ -43,11 +43,13 @@ async def listen_turns(bot: Bot, storage: BaseStorage):
                                         user_id=player.user_id,
                                     ),
                                 )
+
                                 state_data = await state.get_data()
                                 chat_id: str = state_data["chat_id"]
                                 message_id: int = state_data["message_id"]
+
                                 game_tg_message = GameTGMessage.from_buttons(
-                                    game_info(game_world, body["user_id_turn"] == player.user_id),
+                                    game_info(game_world, body["user_id_turn"] == player.user_id, tag),
                                     render_field(game_world, tag),
                                 )
 
@@ -67,4 +69,4 @@ async def listen_turns(bot: Bot, storage: BaseStorage):
                                 await state.update_data(game_world=body["game_world"])
 
                         case _:
-                            return
+                            pass

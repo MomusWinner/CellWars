@@ -40,18 +40,15 @@ async def listen_matches(bot: Bot, storage: BaseStorage):
 
                         if player.user_id == body["user_id_turn"]:
                             await state.set_state(GameGroup.player_turn)
-                            field_markup = add_field_actions(
-                                GameTGMessage.from_field(render_field(game_world, tag))
-                            )
+                            field_markup = add_field_actions(GameTGMessage.from_field(render_field(game_world, tag)))
                         else:
                             await state.set_state(GameGroup.enemy_turn)
-                            field_markup = GameTGMessage.from_field(
-                                render_field(game_world, tag)
-                            )
+                            field_markup = GameTGMessage.from_field(render_field(game_world, tag))
 
                         info = game_info(
                             game_world,
                             player.user_id == body["user_id_turn"],
+                            tag,
                         )
                         await bot.edit_message_text(
                             text=info,
