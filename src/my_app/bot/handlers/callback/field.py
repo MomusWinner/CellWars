@@ -1,16 +1,16 @@
 import aio_pika
 from aiogram import F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InlineKeyboardMarkup
 
-# from my_app import game
+from my_app.bot.composables.actions import add_cancel_button
 from my_app.bot.composables.info import game_info
 from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.types.callbacks import FieldCallback
-from my_app.bot.utils.field import rotate_field
+from my_app.bot.types.game import GameTGMessage
+from my_app.bot.types.renderers import BankRenderer, CastleRenderer, WarriorsRenderer
 
 # from my_app.shared.game.game_logic.core import Player
-from my_app.shared.game.game_logic.game_objects import Castle
 from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
     json_to_game_world,
 )
@@ -19,52 +19,49 @@ from .router import router
 
 channel: aio_pika.Channel
 
-# WARRIOR_TEXT = "Воин:\n  Тип: {type}\n  Колличество: {quantity}"
-# @router.callback_query(FieldCallback.filter(F.type = "warrior"))
-# async def warrior_callback(callback_query: CallbackQuery, state: FSMContext) -> None:
-#     cell = FieldCallback.unpack(callback_query.data)
 
-CASTLE_TEXT = "\nВыбран Замок:\n  Тип: {type}\n  ХП: {hp}"
-
-
-@router.callback_query(FieldCallback.filter(F.type == "castle"), GameGroup.player_turn)
-async def castle_handler(
-    callback_query: CallbackQuery, callback_data: FieldCallback, state: FSMContext
+@router.callback_query(FieldCallback.filter(), F.message.as_("message"), F.message.reply_markup.as_("reply_markup"))
+async def field_handler(
+    callback_query: CallbackQuery,
+    callback_data: FieldCallback,
+    state: FSMContext,
+    message: Message,
+    reply_markup: InlineKeyboardMarkup,
 ) -> None:
-    if not isinstance(callback_query.message, Message):
-        await callback_query.answer("what")
-        return
-
-    message = callback_query.message
-    user_id = callback_query.from_user.id
-
     cell_x = callback_data.cell_x
     cell_y = callback_data.cell_y
 
     data = await state.get_data()
+    state_str = await state.get_state()
+
     game_world_json: str = data["game_world"]
     game_world = json_to_game_world(game_world_json)
+
     user_tag: int = data["user_tag"]
-    users_field = rotate_field(game_world.cells, user_tag)
-    castle = users_field[cell_y][cell_x].game_object
-    if not isinstance(castle, Castle):
-        await callback_query.answer("oh")
-        return
-
-    player = castle.player
-
-    if player.user_id == user_id:
-        type = "Союзник"
-    else:
-        type = "Вражеский"
-
-    await message.edit_text(
-        game_info(game_world, True) + CASTLE_TEXT.format(type=type, hp=castle.hp),
-        reply_markup=message.reply_markup,
+    game_message = GameTGMessage.from_markup(
+        game_info(game_world, state_str == GameGroup.player_turn, user_tag),
+        reply_markup,
     )
-    await callback_query.answer()
 
+    match callback_data.type:
+        case "castle":
+            CastleRenderer(game_world, game_message).add_info(cell_x, cell_y, user_tag)
+        case "warriors":
+            warriors_renderer = WarriorsRenderer(game_world, game_message)
+            warriors_renderer.add_info(cell_x, cell_y, user_tag)
+            if state_str == GameGroup.player_turn:
+                await state.update_data(warriors_place=(cell_y, cell_x))
+                warriors_renderer.add_available_moves(cell_x, cell_y)
+                add_cancel_button(game_message)
+        case "bank":
+            BankRenderer(game_world, game_message).add_info(cell_x, cell_y, user_tag)
+        case _:
+            return
 
-@router.callback_query(FieldCallback.filter(), GameGroup.enemy_turn)
-async def wrong_turn_handler(callback_query: CallbackQuery):
-    await callback_query.answer("Not your turn")
+    try:
+        await message.edit_text(
+            game_message.info,
+            reply_markup=game_message.export_markup(),
+        )
+    finally:
+        await callback_query.answer()
