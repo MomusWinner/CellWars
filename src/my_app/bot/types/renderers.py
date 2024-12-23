@@ -14,17 +14,20 @@ T = TypeVar("T", bound="GameObject")
 
 class GameObjectRenderer(ABC, Generic[T]):
     type_name: str = ""
-    game_world: GameWorld
+    game_world: GameWorld | None
     game_message: GameTGMessage
     info_text: str = ""
     excluded_places: list[str] = []
 
-    def __init__(self, game_world: GameWorld, game_message: GameTGMessage, game_object_type: type[T]) -> None:
+    def __init__(self, game_message: GameTGMessage, game_world: GameWorld | None, game_object_type: type[T]) -> None:
         self.game_world = game_world
         self.game_message = game_message
         self.game_object_type = game_object_type
 
     def add_info(self, x: int, y: int, player_tag: int) -> None:
+        if self.game_world is None:
+            raise ValueError("to add info, game world is not supposed to be None")
+
         rotated_point = rotate_coordinates((y, x), self.game_world.cells, player_tag)
         object = self.game_world.cells[rotated_point[0]][rotated_point[1]].game_object
 
@@ -61,8 +64,8 @@ class WarriorsRenderer(GameObjectRenderer[Warriors]):
         (-1, 0),
     ]
 
-    def __init__(self, game_world: GameWorld, game_message: GameTGMessage) -> None:
-        super().__init__(game_world, game_message, Warriors)
+    def __init__(self, game_message: GameTGMessage, game_world: GameWorld | None = None) -> None:
+        super().__init__(game_message, game_world, Warriors)
 
     @override
     def _format_info_text(self, type: str, object: Warriors) -> str:
@@ -89,8 +92,8 @@ class BankRenderer(GameObjectRenderer[Bank]):
     info_text = "\nВыбран Банк:\n  Тип: {type}\n  ХП: {hp}\n  Цена: {price}"
     excluded_places = ["castle", "bank", "warrior"]
 
-    def __init__(self, game_world: GameWorld, game_message: GameTGMessage) -> None:
-        super().__init__(game_world, game_message, Bank)
+    def __init__(self, game_message: GameTGMessage, game_world: GameWorld | None = None) -> None:
+        super().__init__(game_message, game_world, Bank)
 
     @override
     def _format_info_text(self, type: str, object: Bank) -> str:
@@ -101,8 +104,8 @@ class CastleRenderer(GameObjectRenderer[Castle]):
     type_name = "castle"
     info_text = "\nВыбран Замок:\n  Тип: {type}\n  ХП: {hp}"
 
-    def __init__(self, game_world: GameWorld, game_message: GameTGMessage) -> None:
-        super().__init__(game_world, game_message, Castle)
+    def __init__(self, game_message: GameTGMessage, game_world: GameWorld | None = None) -> None:
+        super().__init__(game_message, game_world, Castle)
 
     @override
     def _format_info_text(self, type: str, object: Castle) -> str:

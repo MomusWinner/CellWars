@@ -45,16 +45,16 @@ async def field_handler(
 
     match callback_data.type:
         case "castle":
-            CastleRenderer(game_world, game_message).add_info(cell_x, cell_y, user_tag)
+            CastleRenderer(game_message, game_world).add_info(cell_x, cell_y, user_tag)
         case "warriors":
-            warriors_renderer = WarriorsRenderer(game_world, game_message)
+            warriors_renderer = WarriorsRenderer(game_message, game_world)
             warriors_renderer.add_info(cell_x, cell_y, user_tag)
             if state_str == GameGroup.player_turn:
                 await state.update_data(warriors_place=(cell_y, cell_x))
                 warriors_renderer.add_available_moves(cell_x, cell_y)
                 add_cancel_button(game_message)
         case "bank":
-            BankRenderer(game_world, game_message).add_info(cell_x, cell_y, user_tag)
+            BankRenderer(game_message, game_world).add_info(cell_x, cell_y, user_tag)
         case _:
             return
 
