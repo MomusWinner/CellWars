@@ -30,22 +30,3 @@ def render_field(game_world: GameWorld, user_tag: int) -> list[list[InlineKeyboa
             )
         field_markup.append(markup_row)
     return field_markup
-
-
-def render_available_warrior_placements(
-    message: GameTGMessage,
-) -> GameTGMessage:
-    new_field = map_available_placements(message.field, "warrior", ["castle", "bank"])
-    message.field = new_field
-    return message
-
-
-def render_available_bank_placements(
-    message: GameTGMessage,
-) -> GameTGMessage:
-    new_field = map_available_placements(message.field, "bank", ["castle", "bank", "warrior"])
-    message.field = new_field
-    return message
-
-
-# def render_available_moves(buttons: list[list[InlineKeyboardButton]], x: int, y: int) -> list[list[InlineKeyboardButton]]
