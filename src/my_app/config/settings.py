@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         return f"amqp://{self.RABBIT_USER}:{self.RABBIT_PASSWORD}@{self.RABBIT_HOST}:{self.RABBIT_PORT}/"
 
     class Config:
-        env_file = "src/my_app/config/.env"
+        env_file = ".env"
 
 
 settings = Settings()
