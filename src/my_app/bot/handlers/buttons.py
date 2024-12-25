@@ -15,6 +15,11 @@ CANCEL_MATCHMAKING_INLINE = ActionButtonInfo(
     callback_data="cancel_matchmaking",
 )
 
+BACK_TO_MENU_INLINE = ActionButtonInfo(
+    text="Вернуться в меню",
+    callback_data="back_to_menu",
+)
+
 PLACE_WARRIORS_INLINE = ActionButtonInfo(
     text="Поставить войнов",
     callback_data="place_warriors",
