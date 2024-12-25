@@ -14,6 +14,8 @@ from my_app.bot.bot import setup_bot, setup_dp
 from my_app.bot.handlers.callback.router import router as callback_router
 from my_app.bot.handlers.command.router import router as command_router
 from my_app.bot.handlers.message.router import router as message_router
+from my_app.bot.handlers.middleware.correlation import CorrelationIdMiddleware
+from my_app.bot.handlers.middleware.logs import LoggingMiddleware
 from my_app.bot.listeners.game import listen_turns
 from my_app.bot.listeners.matchmaking import listen_matches
 from my_app.bot.logger import LOGGING_CONFIG, logger
@@ -62,6 +64,12 @@ async def start_polling() -> None:
     setup_dp(dp)
     bot = Bot(token=settings.BOT_TOKEN)
     setup_bot(bot)
+
+    dp.message.outer_middleware.register(CorrelationIdMiddleware())
+    dp.callback_query.outer_middleware.register(CorrelationIdMiddleware())
+
+    dp.message.outer_middleware.register(LoggingMiddleware())
+    dp.callback_query.outer_middleware.register(LoggingMiddleware())
 
     dp.include_router(command_router)
     dp.include_router(message_router)
