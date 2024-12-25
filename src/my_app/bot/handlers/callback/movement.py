@@ -1,4 +1,4 @@
-import aio_pika
+from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
@@ -9,12 +9,12 @@ from my_app.bot.utils.rabbit import publish_message
 from my_app.shared.game.game_logic.command import PositionCommand, create_move_warriors_command
 from my_app.shared.rabbit.game import GAME_EXCHANGE, GAME_QUEUE
 from my_app.shared.schema.messages.game import create_game_message
+
 from .router import router
-from aiogram import F
 
 
 @router.callback_query(
-    MovementCallback.filter(F.type == "bank"), F.message.as_("message"), F.reply_markup.as_("reply_markup")
+    MovementCallback.filter(F.type == "warrior"), F.message.as_("message"), F.message.reply_markup.as_("reply_markup")
 )
 async def move_warriors_handler(
     callback_query: CallbackQuery,
@@ -22,8 +22,10 @@ async def move_warriors_handler(
     state: FSMContext,
     message: Message,
     reply_markup: InlineKeyboardMarkup,
+    correlation_id: str,
 ) -> None:
     data = await state.get_data()
+
     room_id: str = data["room_id"]
     user_tag: int = data["user_tag"]
     warrior_place: tuple[int, int] = data["warrior_place"]  # (y, x)
@@ -51,5 +53,6 @@ async def move_warriors_handler(
         ),
         GAME_QUEUE,
         GAME_EXCHANGE,
+        correlation_id,
     )
     await callback_query.answer()

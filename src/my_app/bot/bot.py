@@ -24,7 +24,3 @@ def get_dp() -> Dispatcher:
     global dp
 
     return dp
-
-
-#
-# bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))

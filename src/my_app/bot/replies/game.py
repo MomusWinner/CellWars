@@ -1,4 +1,5 @@
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup
+
 from my_app.bot.handlers.buttons import CANCEL_MATCHMAKING_INLINE
 
 

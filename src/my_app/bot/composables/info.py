@@ -1,7 +1,4 @@
-from my_app.bot.types.game import GameTGMessage
-from my_app.bot.utils.field import rotate_coordinates
 from my_app.shared.game.game_logic.core import GameWorld
-from my_app.shared.game.game_logic.game_objects import Bank, Castle, Warriors
 
 INFO_TEXT = "{turn}\n\nКолличество денег: {money}"
 

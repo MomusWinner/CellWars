@@ -1,12 +1,12 @@
+from collections.abc import Awaitable
 from typing import Any, Callable
 from uuid import uuid4
+
+from aiogram import BaseMiddleware
+from aiogram.types import CallbackQuery, Message
 from starlette_context import context
 from starlette_context.header_keys import HeaderKeys
 from typing_extensions import override
-from collections.abc import Awaitable
-
-from aiogram import BaseMiddleware
-from aiogram.types import Message, CallbackQuery
 
 from my_app.config.settings import settings
 

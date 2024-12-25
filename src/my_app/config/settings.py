@@ -1,5 +1,5 @@
-from typing_extensions import TypedDict
 from pydantic_settings import BaseSettings
+from typing_extensions import TypedDict
 
 
 class Icons(TypedDict):
@@ -28,16 +28,16 @@ class Settings(BaseSettings):
     REDIS_PORT: str
 
     ICONSR: Icons = {
-        "bank": '🏦',
-        "castle": '🏰',
-        "warrior": '🧑🏻‍🦯',
-        "field": '🌲',
+        "bank": "🏦",
+        "castle": "🏰",
+        "warrior": "🧑🏻‍🦯",
+        "field": "🌲",
     }
     ICONSB: Icons = {
-        "bank": '🏠',
-        "castle": '🏯',
-        "warrior": '🧑🏿‍🦯',
-        "field": '🌴',
+        "bank": "🏠",
+        "castle": "🏯",
+        "warrior": "🧑🏿‍🦯",
+        "field": "🌴",
     }
 
     @property

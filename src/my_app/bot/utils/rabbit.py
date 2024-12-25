@@ -1,11 +1,12 @@
 import aio_pika
 import msgpack
+
 from my_app.bot.storage.rabbit import channel_pool
 from my_app.shared.schema.messages.base import BaseMessage
 
 
-async def publish_message(dict: BaseMessage, queue_name: str, exchange_name: str) -> None:
-    channel: aio_pika.Channel
+async def publish_message(dict: BaseMessage, queue_name: str, exchange_name: str, correlation_id: str) -> None:
+    channel: aio_pika.abc.AbstractChannel
     async with channel_pool.acquire() as channel:
         queue = await channel.declare_queue(queue_name, durable=True)
         exchange = await channel.declare_exchange(exchange_name, aio_pika.ExchangeType.DIRECT, durable=True)
@@ -16,8 +17,6 @@ async def publish_message(dict: BaseMessage, queue_name: str, exchange_name: str
             return
 
         await exchange.publish(
-            aio_pika.Message(
-                body_exchange,
-            ),
+            aio_pika.Message(body_exchange, correlation_id=correlation_id),
             routing_key=queue_name,
         )

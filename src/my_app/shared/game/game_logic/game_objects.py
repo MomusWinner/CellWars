@@ -12,7 +12,7 @@ class Iterable(ABC):
         raise NotImplementedError("on_iter method is not implemented")
 
 
-class Vulnerable(GameObject):  # type: ignore[misc]
+class Vulnerable(GameObject):
     hp = 10
 
     def __init__(self, cell: Cell, game_world: GameWorld, player: Player) -> None:
@@ -54,7 +54,7 @@ class Bank(Building, Iterable):
         self.player.stats.coins += self.coins_per_iter
 
 
-class Warriors(GameObject):  # type: ignore[misc]
+class Warriors(GameObject):
     max_distance = 1
 
     def __init__(self, cell: Cell, game_world: GameWorld, player: Player, count: int):

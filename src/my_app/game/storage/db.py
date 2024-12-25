@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 from asyncpg import Connection
-from config.settings import settings
 from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -10,6 +9,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from typing_extensions import AsyncGenerator
+
+from my_app.config.settings import settings
 
 
 class CConnection(Connection):

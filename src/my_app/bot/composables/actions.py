@@ -1,4 +1,5 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from my_app.bot.handlers.buttons import (
     CANCEL_FIELD_INLINE,
     PLACE_BANK_INLINE,

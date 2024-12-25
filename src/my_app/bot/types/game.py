@@ -1,8 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from my_app.bot.utils.field import get_type, map_available_placements, rotate_coordinates
-from my_app.shared.game.game_logic.core import GameObject, GameWorld
-
 
 class GameTGMessage:
     info: str

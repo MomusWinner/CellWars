@@ -1,6 +1,7 @@
 from aiogram import F
 from aiogram.filters.callback_data import CallbackQueryFilter
 from aiogram.types import InlineKeyboardButton
+
 from my_app.bot.types.callbacks import ActionCallback, BaseCallback, MenuCallback
 
 

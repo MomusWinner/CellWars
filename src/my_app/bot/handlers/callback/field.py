@@ -1,7 +1,7 @@
 import aio_pika
 from aiogram import F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message, InlineKeyboardMarkup
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
 from my_app.bot.composables.actions import add_cancel_button
 from my_app.bot.composables.info import game_info
@@ -9,11 +9,7 @@ from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.types.callbacks import FieldCallback
 from my_app.bot.types.game import GameTGMessage
 from my_app.bot.types.renderers import BankRenderer, CastleRenderer, WarriorsRenderer
-
-# from my_app.shared.game.game_logic.core import Player
-from my_app.shared.game.game_logic.serialize_deserialize_game_world import (
-    json_to_game_world,
-)
+from my_app.shared.game.game_logic.serialize_deserialize_game_world import json_to_game_world
 
 from .router import router
 
@@ -46,13 +42,16 @@ async def field_handler(
     match callback_data.type:
         case "castle":
             CastleRenderer(game_message, game_world).add_info(cell_x, cell_y, user_tag)
-        case "warriors":
+
+        case "warrior":
             warriors_renderer = WarriorsRenderer(game_message, game_world)
             warriors_renderer.add_info(cell_x, cell_y, user_tag)
-            if state_str == GameGroup.player_turn:
-                await state.update_data(warriors_place=(cell_y, cell_x))
-                warriors_renderer.add_available_moves(cell_x, cell_y)
+
+            if state_str == GameGroup.player_turn and warriors_renderer.add_available_moves(cell_x, cell_y, user_tag):
+                await state.update_data(warrior_place=(cell_y, cell_x))
+                game_message.actions = []
                 add_cancel_button(game_message)
+
         case "bank":
             BankRenderer(game_message, game_world).add_info(cell_x, cell_y, user_tag)
         case _:

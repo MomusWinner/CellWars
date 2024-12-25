@@ -1,11 +1,11 @@
 import logging
-from typing import Any, Callable
-from typing_extensions import override
 from collections.abc import Awaitable
+from typing import Any, Callable
 
 from aiogram import BaseMiddleware
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, Update
+from aiogram.types import CallbackQuery, Message, Update
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
@@ -27,7 +27,7 @@ class LoggingMiddleware(BaseMiddleware):
             user_id = event.chat.id
             user_message = event.text
 
-        state: FSMContext = data['state']
+        state: FSMContext = data["state"]
         correlation_id: str = data["correlation_id"]
         update: Update = data["event_update"]
 

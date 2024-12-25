@@ -8,7 +8,7 @@ class MatchMessage(BaseMessage):
     user_id: int
 
 
-def create_match_message(action: str, user_id: int):
+def create_match_message(action: str, user_id: int) -> MatchMessage:
     return MatchMessage(event=MATCH_MESSAGE_EVENT, action=action, user_id=user_id)
 
 
@@ -19,7 +19,7 @@ class CreateMatchMessage(BaseMessage):
     user_ids: list[int]
 
 
-def create_create_match_message(user_ids: list[int]):
+def create_create_match_message(user_ids: list[int]) -> CreateMatchMessage:
     return CreateMatchMessage(event=CREATE_MATCH_MESSAGE_EVENT, user_ids=user_ids)
 
 

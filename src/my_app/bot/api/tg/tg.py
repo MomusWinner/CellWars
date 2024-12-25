@@ -13,7 +13,6 @@ from my_app.bot.bot import get_bot, get_dp
 @router.post("/webhook")
 async def home_post(
     request: Request,
-    # session: AsyncSession = Depends(get_db),
 ) -> JSONResponse:
     data = await request.json()
     update = Update(**data)

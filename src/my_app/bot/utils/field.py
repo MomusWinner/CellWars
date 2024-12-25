@@ -1,6 +1,7 @@
 from typing import Any, TypeVar
 
-from aiogram.types import InlineKeyboardButton, game
+from aiogram.types import InlineKeyboardButton
+
 from my_app.bot.types.callbacks import FieldCallback, PlacementCallback
 from my_app.config.settings import settings
 from my_app.shared.game.game_logic.core import Cell, GameObject
@@ -30,11 +31,13 @@ def get_icon(game_object: GameObject | None, player_tag: int) -> str:
 
 
 def rotate_clockwise(matrix: list[list[T]]) -> list[list[T]]:
-    return list(zip(*matrix[::-1]))
+    zipped: list[tuple[T, ...]] = list(zip(*matrix[::-1]))
+    return [list(row) for row in zipped]
 
 
 def rotate_counterclockwise(matrix: list[list[T]]) -> list[list[T]]:
-    return list(zip(*matrix))[::-1]
+    zipped: list[tuple[T, ...]] = list(zip(*matrix))[::-1]
+    return [list(row) for row in zipped]
 
 
 def rotate_coordinates_clockwise(point: tuple[int, int], len_x: int) -> tuple[int, int]:

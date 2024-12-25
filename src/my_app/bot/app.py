@@ -1,5 +1,8 @@
 import asyncio
 import logging.config
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from typing import Any
 
 import uvicorn
 from aiogram import Bot, Dispatcher
@@ -19,11 +22,12 @@ from my_app.bot.handlers.middleware.logs import LoggingMiddleware
 from my_app.bot.listeners.game import listen_turns
 from my_app.bot.listeners.matchmaking import listen_matches
 from my_app.bot.logger import LOGGING_CONFIG, logger
-from my_app.bot.storage.redis import setup_redis
+from my_app.bot.storage.redis import get_redis, setup_redis
 from my_app.config.settings import settings
 
 
-async def lifespan(app: FastAPI) -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.info("Starting bot")
 
@@ -53,7 +57,8 @@ async def start_polling() -> None:
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.info("Starting bot")
 
-    redis = setup_redis()
+    setup_redis()
+    redis = get_redis()
     storage = RedisStorage(redis=redis)
 
     dp = Dispatcher(

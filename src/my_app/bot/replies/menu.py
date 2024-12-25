@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup
+
 from my_app.bot.handlers.buttons import MATCHMAKING_INLINE, STATS_INLINE
 
 

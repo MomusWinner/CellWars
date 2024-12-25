@@ -1,12 +1,7 @@
 from aiogram.types import InlineKeyboardButton
+
 from my_app.bot.types.callbacks import FieldCallback
-from my_app.bot.types.game import GameTGMessage
-from my_app.bot.utils.field import (
-    get_icon,
-    get_type,
-    map_available_placements,
-    rotate_field,
-)
+from my_app.bot.utils.field import get_icon, get_type, rotate_field
 from my_app.shared.game.game_logic.core import GameWorld
 
 
