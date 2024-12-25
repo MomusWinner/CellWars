@@ -137,34 +137,3 @@ async def place_bank_handler(
     )
 
     await callback_query.answer()
-
-
-@router.message(PlacementGroup.warriors, F.text.regexp(r"^(\d+)$").as_("count"), F.from_user.id.as_("user_id"))
-async def warrior_count_handler(
-    callback_query: CallbackQuery, message: Message, state: FSMContext, count: Match[str], user_id: int
-) -> None:
-    data = await state.get_data()
-    room_id: str = data["room_id"]
-    user_tag: int = data["user_tag"]
-    warrior_place: tuple[int, int] = data["warrior_place"]  # (y, x)
-    game_world_json: str = data["game_world"]
-    game_world = json_to_game_world(game_world_json)
-
-    point_rotated = rotate_coordinates(warrior_place, game_world.cells, user_tag)
-    position: PositionCommand = {"x": point_rotated[0], "y": point_rotated[1]}
-
-    await publish_message(
-        create_game_message(
-            room_id=room_id,
-            command=create_buy_warriors_command(
-                user_id=user_id,
-                count=int(count.string),
-                position=position,
-            ),
-        ),
-        GAME_QUEUE,
-        GAME_EXCHANGE,
-    )
-
-    await message.delete()
-    await callback_query.answer()
