@@ -1,6 +1,5 @@
 import logging.config
 from contextvars import ContextVar
-from typing import Any
 
 import yaml
 

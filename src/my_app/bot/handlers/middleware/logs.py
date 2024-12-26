@@ -1,5 +1,4 @@
 import logging
-from my_app.bot.logger import logger
 from collections.abc import Awaitable
 from typing import Any, Callable
 
