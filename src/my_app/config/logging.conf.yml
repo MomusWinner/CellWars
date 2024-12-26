@@ -3,14 +3,23 @@ disable_existing_loggers: no
 formatters:
   console_formatter_game:
     (): my_app.game.logger.ConsoleFormatter
+    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "message": "%(message)s"}'
   console_formatter_bot:
     (): my_app.bot.logger.ConsoleFormatter
+    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "message": "%(message)s"}'
+  console_formatter_bot_update:
+    (): my_app.bot.logger.ConsoleFormatter
+    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "update": %(message)s}'
   console_formatter_matchmaker:
     (): my_app.matchmaker.logger.ConsoleFormatter
+    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "message": "%(message)s"}'
 handlers:
   console_handler_bot:
     class: logging.StreamHandler
     formatter: console_formatter_bot
+  console_handler_bot_update:
+    class: logging.StreamHandler
+    formatter: console_formatter_bot_update
   console_handler_game:
     class: logging.StreamHandler
     formatter: console_formatter_game
@@ -29,6 +38,10 @@ loggers:
     level: INFO
     propagate: no
     handlers: [console_handler_bot]
+  'bot_update_logger':
+    level: INFO
+    propogate: no
+    handlers: [console_handler_bot_update]
   'matchmaker_logger':
     level: INFO
     propagate: no

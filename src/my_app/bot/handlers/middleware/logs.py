@@ -1,4 +1,5 @@
 import logging
+from my_app.bot.logger import logger
 from collections.abc import Awaitable
 from typing import Any, Callable
 
@@ -7,8 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, Update
 from typing_extensions import override
 
-logger = logging.getLogger(__name__)
-logger.setLevel(level=logging.INFO)
+logger = logging.getLogger("bot_update_logger")
 
 
 class LoggingMiddleware(BaseMiddleware):
@@ -32,12 +32,12 @@ class LoggingMiddleware(BaseMiddleware):
         update: Update = data["event_update"]
 
         logger.info(
-            '{ "correlation_id": "%s", "update_id": %s, "user": %s, message: "%s", "state": { "context" : %s }',
-            correlation_id,
+            '{"update_id": %s, "user": %s, message: "%s", "state": { "context" : %s }}',
             update.update_id,
             user_id,
             user_message,
             await state.get_state(),
+            extra={"corr_id": correlation_id},
         )
 
         await handler(event, data)

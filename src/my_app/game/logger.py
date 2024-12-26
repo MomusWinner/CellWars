@@ -9,15 +9,17 @@ with open("src/my_app/config/logging.conf.yml", "r") as f:
 
 class ConsoleFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        corr_id = correlation_id_ctx.get(None)
-
-        if corr_id is not None:
-            return "[%s] %s" % (corr_id, super().format(record))
-
         return super().format(record)
+
+
+class CorrelationFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        record.corr_id = "%s" % correlation_id_ctx.get(None)
+        return True
 
 
 correlation_id_ctx: ContextVar[str] = ContextVar("correlation_id")
 
 
 logger = logging.getLogger("game_logger")
+logger.addFilter(CorrelationFilter())
