@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from my_app.bot.handlers.states.game import PlacementGroup
+from my_app.bot.metrics import measure_time
 from my_app.bot.types.game import GameTGMessage
 from my_app.bot.types.renderers import WarriorsRenderer
 from my_app.bot.utils.field import rotate_coordinates
@@ -20,6 +21,7 @@ from .router import router
 @router.message(
     PlacementGroup.warriors, F.text.cast(int) > 0, F.text.cast(int).as_("count"), F.from_user.id.as_("user_id")
 )
+@measure_time
 async def warrior_count_handler(
     message: Message, bot: Bot, state: FSMContext, count: int, user_id: int, correlation_id: str
 ) -> None:
@@ -66,5 +68,6 @@ async def warrior_count_handler(
 
 
 @router.message(PlacementGroup.warriors)
+@measure_time
 async def delete_wrong_messages(message: Message) -> None:
     await message.delete()

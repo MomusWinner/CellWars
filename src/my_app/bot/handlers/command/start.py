@@ -4,10 +4,12 @@ from aiogram.types import Message
 
 from my_app.bot.handlers.callback.router import router
 from my_app.bot.handlers.states.menu import MenuGroup
+from my_app.bot.metrics import measure_time
 from my_app.bot.replies.menu import start_menu
 
 
 @router.message(Command("start"))
+@measure_time
 async def start_cmd(message: Message, state: FSMContext) -> None:
     await state.set_state(MenuGroup.start)
     text, markup = start_menu()

@@ -6,6 +6,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 from my_app.bot.composables.actions import add_cancel_button
 from my_app.bot.composables.info import game_info
 from my_app.bot.handlers.states.game import GameGroup
+from my_app.bot.metrics import measure_time
 from my_app.bot.types.callbacks import FieldCallback
 from my_app.bot.types.game import GameTGMessage
 from my_app.bot.types.renderers import BankRenderer, CastleRenderer, WarriorsRenderer
@@ -17,6 +18,7 @@ channel: aio_pika.Channel
 
 
 @router.callback_query(FieldCallback.filter(), F.message.as_("message"), F.message.reply_markup.as_("reply_markup"))
+@measure_time
 async def field_handler(
     callback_query: CallbackQuery,
     callback_data: FieldCallback,

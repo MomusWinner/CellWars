@@ -2,6 +2,7 @@ from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
+from my_app.bot.metrics import measure_time
 from my_app.bot.types.callbacks import MovementCallback
 from my_app.bot.types.game import GameTGMessage
 from my_app.bot.utils.field import rotate_coordinates
@@ -16,6 +17,7 @@ from .router import router
 @router.callback_query(
     MovementCallback.filter(F.type == "warrior"), F.message.as_("message"), F.message.reply_markup.as_("reply_markup")
 )
+@measure_time
 async def move_warriors_handler(
     callback_query: CallbackQuery,
     callback_data: MovementCallback,

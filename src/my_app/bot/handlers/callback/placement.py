@@ -10,6 +10,7 @@ from my_app.bot.handlers.buttons import (
     PLACE_WARRIORS_INLINE,
 )
 from my_app.bot.handlers.states.game import PlacementGroup
+from my_app.bot.metrics import measure_time
 from my_app.bot.types.callbacks import PlacementCallback
 from my_app.bot.types.game import GameTGMessage
 from my_app.bot.types.renderers import BankRenderer, WarriorsRenderer
@@ -29,6 +30,7 @@ from .router import router
     F.message.reply_markup.as_("reply_markup"),
     F.message.text.as_("text"),
 )
+@measure_time
 async def warrior_placement_intent_handler(
     callback_query: CallbackQuery,
     message: Message,
@@ -51,6 +53,7 @@ async def warrior_placement_intent_handler(
     F.message.reply_markup.as_("reply_markup"),
     F.message.text.as_("text"),
 )
+@measure_time
 async def bank_placement_intent_handler(
     callback_query: CallbackQuery,
     message: Message,
@@ -68,6 +71,7 @@ async def bank_placement_intent_handler(
 
 
 @router.callback_query(CANCEL_FIELD_INLINE(), F.message.as_("message"))
+@measure_time
 async def cancel_placement_handler(
     callback_query: CallbackQuery,
     message: Message,
@@ -87,6 +91,7 @@ async def cancel_placement_handler(
 
 
 @router.callback_query(PlacementCallback.filter(F.type == "warrior"), F.message.as_("message"))
+@measure_time
 async def place_warriors_handler(
     callback_query: CallbackQuery,
     callback_data: PlacementCallback,
@@ -110,6 +115,7 @@ async def place_warriors_handler(
 @router.callback_query(
     PlacementCallback.filter(F.type == "bank"), F.message.reply_markup.as_("reply_markup"), F.message.text.as_("text")
 )
+@measure_time
 async def place_bank_handler(
     callback_query: CallbackQuery,
     callback_data: PlacementCallback,

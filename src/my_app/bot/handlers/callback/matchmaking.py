@@ -9,6 +9,7 @@ from my_app.bot.handlers.buttons import (
 )
 from my_app.bot.handlers.states.game import GameGroup
 from my_app.bot.handlers.states.menu import MenuGroup
+from my_app.bot.metrics import measure_time
 from my_app.bot.replies.game import search_match
 from my_app.bot.replies.menu import start_menu
 from my_app.bot.utils.rabbit import publish_message
@@ -19,6 +20,7 @@ from .router import router
 
 
 @router.callback_query(MATCHMAKING_INLINE(), F.message.as_("message"))
+@measure_time
 async def start_matchmaking(
     callback_query: CallbackQuery, state: FSMContext, message: Message, correlation_id: str
 ) -> None:
@@ -38,6 +40,7 @@ async def start_matchmaking(
 
 
 @router.callback_query(CANCEL_MATCHMAKING_INLINE(), F.message.as_("message"))
+@measure_time
 async def cancel_matchmaking(
     callback_query: CallbackQuery, state: FSMContext, message: Message, correlation_id: str
 ) -> None:
@@ -57,6 +60,7 @@ async def cancel_matchmaking(
 
 
 @router.callback_query(BACK_TO_MENU_INLINE(), F.message.as_("message"))
+@measure_time
 async def back_to_menu_handler(callback_query: CallbackQuery, state: FSMContext, message: Message) -> None:
     await callback_query.answer()
     await state.set_state(MenuGroup.start)
