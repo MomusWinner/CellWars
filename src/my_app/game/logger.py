@@ -19,4 +19,5 @@ class ConsoleFormatter(logging.Formatter):
 
 correlation_id_ctx: ContextVar[str] = ContextVar("correlation_id")
 
+
 logger = logging.getLogger("game_logger")

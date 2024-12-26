@@ -1,6 +1,7 @@
 import aio_pika
 import msgpack
 
+from my_app.game.logger import correlation_id_ctx
 from my_app.game.handlers.game import handle_game_event
 from my_app.game.storage.rabbit import channel_pool
 from my_app.shared.rabbit.game import GAME_QUEUE
@@ -17,6 +18,7 @@ async def handle_games() -> None:
         async with queue.iterator() as queue_iter:
             async for message in queue_iter:
                 async with message.process():
+                    correlation_id_ctx.set(message.correlation_id)
                     body: GameMessage = msgpack.unpackb(message.body)
                     if body["event"] == GAME_MESSAGE_EVENT:
                         await handle_game_event(body)

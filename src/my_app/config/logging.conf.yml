@@ -20,6 +20,7 @@ handlers:
 root:
   level: INFO
   handlers: [console_handler_game]
+loggers:
   'game_logger':
     level: INFO
     propagate: no
