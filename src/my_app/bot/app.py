@@ -3,6 +3,8 @@ import logging.config
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
+from starlette_context.middleware import RawContextMiddleware
+from starlette_context.plugins import CorrelationIdPlugin  # type: ignore[attr-defined, unused-ignore] # pyright: ignore[reportPrivateImportUsage]
 
 import uvicorn
 from aiogram import Bot, Dispatcher
@@ -31,32 +33,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.info("Starting bot")
 
-    dp = Dispatcher()
-    setup_dp(dp)
-    bot = Bot(token=settings.BOT_TOKEN)
-    setup_bot(bot)
-
-    await bot.set_webhook(settings.BOT_WEBHOOK_URL)
-    yield
-
-    while background_tasks:
-        await asyncio.sleep(0)
-
-    logging.getLogger("uvicorn").info("Ending lifespan")
-
-
-def create_app() -> FastAPI:
-    app = FastAPI(docs_url="/swagger", lifespan=lifespan)
-    app.include_router(v1_router, prefix="/v1", tags=["v1"])
-    app.include_router(tg_router, prefix="/tg", tags=["tg"])
-
-    return app
-
-
-async def start_polling() -> None:
-    logging.config.dictConfig(LOGGING_CONFIG)
-    logger.info("Starting bot")
-
     setup_redis()
     redis = get_redis()
     storage = RedisStorage(redis=redis)
@@ -81,16 +57,44 @@ async def start_polling() -> None:
     dp.include_router(callback_router)
     await bot.delete_webhook()
 
-    logging.info("Dependencies launched")
-    await asyncio.gather(
-        listen_matches(bot, storage), listen_turns(bot, storage), dp.start_polling(bot, handle_signals=False)
-    )
+    tasks = []
+
+    matches_task = asyncio.create_task(listen_matches(bot, storage))
+    turns_task = asyncio.create_task(listen_turns(bot, storage))
+
+    tasks.append(matches_task)
+    tasks.append(turns_task)
+
+    if not settings.BOT_WEBHOOK_URL:
+        polling_task = asyncio.create_task(dp.start_polling(bot, handle_signals=False))
+        tasks.append(polling_task)
+
+    gathered_task = asyncio.gather(*tasks)
+
+    await bot.set_webhook(settings.BOT_WEBHOOK_URL)
+    yield
+
+    gathered_task.cancel()
+    while background_tasks:
+        await asyncio.sleep(0)
+
+    logging.getLogger("uvicorn").info("Ending lifespan")
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(docs_url="/swagger", lifespan=lifespan)
+    app.include_router(v1_router, prefix="/v1", tags=["v1"])
+    app.include_router(tg_router, prefix="/tg", tags=["tg"])
+
+    app.add_middleware(
+        RawContextMiddleware, plugins=[CorrelationIdPlugin()]
+    )  # pyright: ignore[reportPrivateImportUsage]
+    return app
+
+
+def start_bot() -> None:
+    uvicorn.run("my_app.bot.app:create_app", factory=True, host="0.0.0.0", port=8000, workers=1)
 
 
 if __name__ == "__main__":
-    if settings.BOT_WEBHOOK_URL:
-        logging.info("Start webhook")
-        uvicorn.run("src.app:create_app", factory=True, host="0.0.0.0", port=8000, workers=1)
-    else:
-        logging.info("Start polling")
-        asyncio.run(start_polling())
+    start_bot()
