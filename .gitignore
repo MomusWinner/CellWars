@@ -7,6 +7,7 @@ __pycache__
 htmlcov
 dist
 site
+build
 .coverage*
 coverage.xml
 .netlify
@@ -14,7 +15,7 @@ test.db
 log.txt
 Pipfile.lock
 env3.*
-env
+*env
 docs_build
 site_build
 *venv

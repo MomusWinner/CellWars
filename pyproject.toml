@@ -1,9 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src/my_app" }
+
+[project]
+name = "my_app"
+version = "0.1.0"
+description = "Bla bla bla"
+readme = "README.md"
+requires-python = ">=3.11"
+
 [tool.poetry]
-name = "sirius"
+name = "cell wars"
 version = "0.1.0"
 description = ""
-package-mode = false
-authors = [""]
+authors = ["areg"]
+readme = "README.md"
+packages = [{include = "my_app", from="src"}]
 
 [tool.poetry.dependencies]
 aiohttp = "3.9.5"
@@ -19,12 +34,14 @@ fastapi = "^0.114.0"
 uvicorn = "^0.30.6"
 pyjwt = "^2.9.0"
 greenlet = "^3.0.3"
-uvloop = "^0.20.0"
 aiogram = "^3.13.0"
 redis = "^5.0.8"
 hiredis = "^3.0.0"
 aio-pika = "^9.4.3"
 msgpack = "^1.1.0"
+starlette-context = "^0.3.6"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "1.4"
@@ -65,8 +82,12 @@ extend-exclude = '''
 )
 '''
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
 [tool.isort]
-line_length = 120
+line_length = 100
 combine_as_imports = true
 order_by_type = true
 include_trailing_comma = true
@@ -89,7 +110,9 @@ exclude = [
     "^conf/",
     "^tests/",
     "^utils/",
+    "^.venv/",
 ]
+disable_error_code = ["import-untyped", "no-redef"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
@@ -103,6 +126,12 @@ module = [
     "prometheus_client.*",
     "starlette_prometheus.*",
     "uvicorn.*",
+    "my_app.*"
 ]
 ignore_missing_imports = true
 
+[tool.basedpyright]
+reportUnusedCallResult = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
