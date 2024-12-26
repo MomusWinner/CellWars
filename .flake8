@@ -12,6 +12,8 @@ extend-ignore=
         # black brother
         BLK100,
 per-file-ignores=
+		__init__.py:
+				F401
         test_*.py:
                 # assert usage
                 S101,

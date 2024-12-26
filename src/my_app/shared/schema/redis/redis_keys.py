@@ -1,1 +1,1 @@
-ROOM_KEY = 'room:{room_id}'
+ROOM_KEY = "room:{room_id}"

@@ -33,10 +33,10 @@ class MockChannel:
     async def set_qos(self, *args, **kwargs) -> None:
         return
 
-    async def declare_queue(self, *args, **kwargs) -> 'MockQueue':
+    async def declare_queue(self, *args, **kwargs) -> "MockQueue":
         return self.queue
 
-    async def declare_exchange(self, *args, **kwargs) -> 'MockQueue':
+    async def declare_exchange(self, *args, **kwargs) -> "MockQueue":
         return self.exchange
 
 
@@ -102,8 +102,7 @@ class MockMessage:
         return MockMessageProcess()
 
 
-class MockExchange(Mock):
-    ...
+class MockExchange(Mock): ...
 
 
 class MockExchangeMessage(aio_pika.Message):
