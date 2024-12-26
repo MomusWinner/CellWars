@@ -3,7 +3,7 @@ import logging.config
 import msgpack
 
 from my_app.matchmaker.handlers.match import handle_event_get_match
-from my_app.matchmaker.logger import LOGGING_CONFIG, logger, correlation_id_ctx
+from my_app.matchmaker.logger import LOGGING_CONFIG, correlation_id_ctx, logger
 from my_app.matchmaker.storage import rabbit
 from my_app.shared.rabbit.matchmaking import MATCHES_QUEUE
 from my_app.shared.schema.messages.match import MATCH_MESSAGE_EVENT, MatchMessage

@@ -3,7 +3,7 @@ from asyncio import Lock
 import aio_pika
 import msgpack
 
-from my_app.matchmaker.logger import logger, correlation_id_ctx
+from my_app.matchmaker.logger import correlation_id_ctx, logger
 from my_app.matchmaker.storage import rabbit
 from my_app.shared.rabbit.matchmaking import CREATE_MATCH_QUEUE, GAME_MATCH_EXCHANGE
 from my_app.shared.schema.messages.match import create_create_match_message

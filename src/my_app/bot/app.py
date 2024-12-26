@@ -3,14 +3,16 @@ import logging.config
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
-from starlette_context.middleware import RawContextMiddleware
-from starlette_context.plugins import CorrelationIdPlugin  # type: ignore[attr-defined, unused-ignore] # pyright: ignore[reportPrivateImportUsage]
 
 import uvicorn
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.strategy import FSMStrategy
 from fastapi import FastAPI
+from starlette_context.middleware import RawContextMiddleware
+from starlette_context.plugins import (
+    CorrelationIdPlugin,  # type: ignore[attr-defined, unused-ignore] # pyright: ignore[reportPrivateImportUsage]
+)
 
 from my_app.bot.api.tg.router import router as tg_router
 from my_app.bot.api.v1.router import router as v1_router
