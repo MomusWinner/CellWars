@@ -59,7 +59,17 @@ services:
     networks:
       - sirius
 
-  # bot:
+  bot:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: python -m src.my_app.bot
+    restart: always
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - sirius
 
 networks:
   sirius:
