@@ -25,7 +25,6 @@ integration methods",
     buckets=BUCKETS,
 )
 
-
 BOT_MESSAGES_PRODUCED = Counter("bot_rabbitmq_messages_produced_total", "Total messages produced to RabbitMQ")
 TURN_MESSAGES_CONSUMED = Counter("bot_turn_rabbitmq_messages_consumed_totals", "Total messages consumed from RabbitMQ")
 MATCH_MESSAGES_CONSUMED = Counter(
