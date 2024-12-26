@@ -11,3 +11,4 @@ class ConsoleFormatter(logging.Formatter):
 
 
 logger = logging.getLogger("bot_logger")
+logger.addFilter(CorrelationFilter())

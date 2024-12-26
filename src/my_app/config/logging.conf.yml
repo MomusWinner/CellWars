@@ -6,7 +6,7 @@ formatters:
     format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "message": "%(message)s"}'
   console_formatter_bot:
     (): my_app.bot.logger.ConsoleFormatter
-    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "message": "%(message)s"}'
+    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}'
   console_formatter_bot_update:
     (): my_app.bot.logger.ConsoleFormatter
     format: '{"time": "%(asctime)s", "level": "%(levelname)s", "correlation_id": "%(corr_id)s", "update": %(message)s}'
@@ -28,7 +28,7 @@ handlers:
     formatter: console_formatter_matchmaker
 root:
   level: INFO
-  handlers: [console_handler_game]
+  handlers: [console_handler_bot]
 loggers:
   'game_logger':
     level: INFO
