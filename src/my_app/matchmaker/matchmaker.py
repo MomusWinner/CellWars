@@ -16,6 +16,8 @@ class Matchmaker:
 
     async def add_user(self, user_id: int) -> None:
         async with self._users_lock:
+            if user_id in self._users_ids:
+                return
             self._users_ids.append(user_id)
         await self.create_match()
 
