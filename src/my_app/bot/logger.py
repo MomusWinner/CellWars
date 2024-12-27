@@ -1,4 +1,5 @@
 import logging.config
+
 import yaml
 
 with open("src/my_app/config/logging.conf.yml", "r") as f:

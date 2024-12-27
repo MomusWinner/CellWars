@@ -59,13 +59,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     dp.include_router(callback_router)
     await bot.delete_webhook()
 
-    tasks = []
-
     matches_task = asyncio.create_task(listen_matches(bot, storage))
     turns_task = asyncio.create_task(listen_turns(bot, storage))
 
-    tasks.append(matches_task)
-    tasks.append(turns_task)
+    tasks = [matches_task, turns_task]
 
     if not settings.BOT_WEBHOOK_URL:
         polling_task = asyncio.create_task(dp.start_polling(bot, handle_signals=False))

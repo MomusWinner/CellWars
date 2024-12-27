@@ -5,11 +5,6 @@ MATCHMAKING_INLINE = MenuButtonInfo(
     callback_data="matchmake",
 )
 
-STATS_INLINE = MenuButtonInfo(
-    text="Посмотреть статистику",
-    callback_data="stats",
-)
-
 CANCEL_MATCHMAKING_INLINE = ActionButtonInfo(
     text="Отмена",
     callback_data="cancel_matchmaking",
